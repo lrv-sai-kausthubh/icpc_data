@@ -665,201 +665,6 @@ function combineAndRenderData() {
     renderConsolidatedTable(consolidatedData);
 }
 
-// function renderConsolidatedTable(data) {
-//     if (data.length === 0) {
-//         document.getElementById("table-container").innerHTML = "<p>No data to display. Please select at least one platform.</p>";
-//         return;
-//     }
-    
-//     // Determine which categories to show based on platform visibility and filters
-//     let atcoderCategories = [];
-//     if (platformVisibility.atcoder) {
-//         atcoderCategories = ["A", "B", "C", "D", "E", "F", "G", "H/Ex"]
-//             .filter(cat => categoryFilters[cat]);
-//     }
-    
-//     let cfCategories = [];
-//     if (platformVisibility.codeforces) {
-//         cfCategories = ["CF-800", "CF-1000", "CF-1200", "CF-1400", "CF-1600", "CF-1900"]
-//             .filter(cat => categoryFilters[cat]);
-//     }
-    
-//     // Start building table
-//     let html = "<table><tr><th>Username</th><th>Platform IDs</th>";
-    
-//     // Add headers for AtCoder categories
-//     atcoderCategories.forEach(category => {
-//         html += `<th>${category}</th>`;
-//     });
-    
-//     // Add headers for CodeForces categories
-//     cfCategories.forEach(category => {
-//         // Display rating ranges
-//         let displayText = "";
-//         switch(category) {
-//             case "CF-800": displayText = "800-999"; break;
-//             case "CF-1000": displayText = "1000-1199"; break;
-//             case "CF-1200": displayText = "1200-1399"; break;
-//             case "CF-1400": displayText = "1400-1599"; break;
-//             case "CF-1600": displayText = "1600-1899"; break;
-//             case "CF-1900": displayText = "1900+"; break;
-//             default: displayText = category.replace('CF-', '');
-//         }
-//         html += `<th>${displayText}</th>`;
-//     });
-    
-//     // Add total column
-//     html += "<th>Total</th></tr>";
-    
-//     // Find the top performer
-//     const topTotal = data[0].Total !== "Err" ? data[0].Total : 0;
-    
-//     // Add rows for each user
-//     data.forEach(row => {
-//         const isTop = (row.Total === topTotal && row.Total !== "Err");
-//         const topClass = isTop ? "top" : "";
-        
-//         html += `<tr class="${topClass}">
-//             <td>${row.Username}</td>
-//             <td>`;
-            
-//         // Show platform usernames with appropriate tags
-//         if (row.AtCoderUsername && row.AtCoderUsername !== "-") {
-//             html += `<span class="platform-tag atcoder-tag">AC: ${row.AtCoderUsername}</span> `;
-//         }
-//         if (row.CodeforcesUsername && row.CodeforcesUsername !== "-") {
-//             html += `<span class="platform-tag codeforces-tag">CF: ${row.CodeforcesUsername}</span>`;
-//         }
-        
-//         html += `</td>`;
-        
-//         // Add AtCoder category cells
-//         atcoderCategories.forEach(category => {
-//             html += `<td>${row[category]}</td>`;
-//         });
-        
-//         // Add CodeForces category cells
-//         cfCategories.forEach(category => {
-//             html += `<td>${row[category]}</td>`;
-//         });
-        
-//         // Calculate filtered total based on selected categories
-//         let filteredTotal = 0;
-//         if (row.Total !== "Err") {
-//             // For AtCoder categories
-//             atcoderCategories.forEach(cat => {
-//                 if (row[cat] !== "-" && !isNaN(parseInt(row[cat]))) {
-//                     filteredTotal += parseInt(row[cat]);
-//                 }
-//             });
-            
-//             // For CodeForces categories
-//             cfCategories.forEach(cat => {
-//                 if (row[cat] !== "-" && !isNaN(parseInt(row[cat]))) {
-//                     filteredTotal += parseInt(row[cat]);
-//                 }
-//             });
-//         } else {
-//             filteredTotal = "Err";
-//         }
-        
-//         html += `<td>${filteredTotal}</td></tr>`;
-//     });
-    
-//     // Calculate summary statistics
-//     if (data.length > 0) {
-//         // AtCoder averages
-//         if (platformVisibility.atcoder && atcoderCategories.length > 0) {
-//             const validAtcoderData = data.filter(user => user.AtCoderTotal !== "Err" && user.AtCoderTotal !== "-");
-            
-//             if (validAtcoderData.length > 0) {
-//                 html += `<tr class="summary-row"><td><strong>AtCoder Average</strong></td><td>-</td>`;
-                
-//                 // AtCoder category averages
-//                 atcoderCategories.forEach(category => {
-//                     const avg = validAtcoderData.reduce((sum, user) => {
-//                         if (user[category] === "-" || user[category] === "Err") return sum;
-//                         return sum + (parseInt(user[category]) || 0);
-//                     }, 0) / validAtcoderData.length;
-//                     html += `<td>${avg.toFixed(1)}</td>`;
-//                 });
-                
-//                 // Empty cells for CF categories
-//                 cfCategories.forEach(() => {
-//                     html += `<td>-</td>`;
-//                 });
-                
-//                 html += `<td>-</td></tr>`;
-//             }
-//         }
-        
-//         // CodeForces averages
-//         if (platformVisibility.codeforces && cfCategories.length > 0) {
-//             const validCfData = data.filter(user => user.CodeforcesTotal !== "Err" && user.CodeforcesTotal !== "-");
-            
-//             if (validCfData.length > 0) {
-//                 html += `<tr class="summary-row"><td><strong>CodeForces Average</strong></td><td>-</td>`;
-                
-//                 // Empty cells for AtCoder categories
-//                 atcoderCategories.forEach(() => {
-//                     html += `<td>-</td>`;
-//                 });
-                
-//                 // CodeForces category averages
-//                 cfCategories.forEach(category => {
-//                     const avg = validCfData.reduce((sum, user) => {
-//                         if (user[category] === "-" || user[category] === "Err") return sum;
-//                         return sum + (parseInt(user[category]) || 0);
-//                     }, 0) / validCfData.length;
-//                     html += `<td>${avg.toFixed(1)}</td>`;
-//                 });
-                
-//                 html += `<td>-</td></tr>`;
-//             }
-//         }
-//     }
-    
-//     html += "</table>";
-    
-//     // Display active filters
-//     let filterInfo = "<div class='active-filters'><strong>Showing: </strong>";
-    
-//     // Display selected platforms
-//     if (platformVisibility.atcoder) {
-//         filterInfo += `<span class="platform-tag atcoder-tag">AtCoder</span>`;
-//     }
-//     if (platformVisibility.codeforces) {
-//         filterInfo += `<span class="platform-tag codeforces-tag">CodeForces</span>`;
-//     }
-    
-//     // Display selected categories
-//     let hasFilters = false;
-//     if (atcoderCategories.length < 8 || cfCategories.length < 6) {
-//         hasFilters = true;
-//         filterInfo += " <strong>Categories:</strong> ";
-//         atcoderCategories.forEach(category => {
-//             filterInfo += `<span class='filter-tag'>${category}</span>`;
-//         });
-//         cfCategories.forEach(category => {
-//             // Use proper display text for rating ranges
-//             let displayText = "";
-//             switch(category) {
-//                 case "CF-800": displayText = "800-999"; break;
-//                 case "CF-1000": displayText = "1000-1199"; break;
-//                 case "CF-1200": displayText = "1200-1399"; break;
-//                 case "CF-1400": displayText = "1400-1599"; break;
-//                 case "CF-1600": displayText = "1600-1899"; break;
-//                 case "CF-1900": displayText = "1900+"; break;
-//                 default: displayText = category.replace('CF-', '');
-//             }
-//             filterInfo += `<span class='filter-tag'>${displayText}</span>`;
-//         });
-//     }
-    
-//     filterInfo += "</div>";
-    
-//     document.getElementById("table-container").innerHTML = (hasFilters ? filterInfo : "") + html;
-// }
 
 function renderConsolidatedTable(data) {
     if (data.length === 0) {
@@ -962,57 +767,91 @@ function renderConsolidatedTable(data) {
         html += `<td>${filteredTotal}</td></tr>`;
     });
     
-    // Calculate summary statistics
-    if (data.length > 0) {
-        // AtCoder averages
-        if (platformVisibility.atcoder && atcoderCategories.length > 0) {
-            const validAtcoderData = data.filter(user => user.AtCoderTotal !== "Err" && user.AtCoderTotal !== "-");
+    // Calculate summary statistics - COMBINED IN SINGLE ROW
+    if (data.length > 0 && (platformVisibility.atcoder || platformVisibility.codeforces)) {
+        // Prepare data for averages
+        const validAtcoderData = platformVisibility.atcoder ? 
+            data.filter(user => user.AtCoderTotal !== "Err" && user.AtCoderTotal !== "-") : [];
             
+        const validCfData = platformVisibility.codeforces ? 
+            data.filter(user => user.CodeforcesTotal !== "Err" && user.CodeforcesTotal !== "-") : [];
+        
+        // Start the combined averages row
+        html += `<tr class="summary-row"><td><strong>Platform Averages</strong></td><td>`;
+        
+        // Show platform tags in the second column
+        if (platformVisibility.atcoder && validAtcoderData.length > 0) {
+            html += `<span class="platform-tag atcoder-tag">AC</span> `;
+        }
+        if (platformVisibility.codeforces && validCfData.length > 0) {
+            html += `<span class="platform-tag codeforces-tag">CF</span>`;
+        }
+        
+        html += `</td>`;
+        
+        // Add AtCoder category averages
+        atcoderCategories.forEach(category => {
             if (validAtcoderData.length > 0) {
-                html += `<tr class="summary-row"><td><strong>AtCoder Average</strong></td><td>-</td>`;
-                
-                // AtCoder category averages
+                const avg = validAtcoderData.reduce((sum, user) => {
+                    if (user[category] === "-" || user[category] === "Err") return sum;
+                    return sum + (parseInt(user[category]) || 0);
+                }, 0) / validAtcoderData.length;
+                html += `<td>${avg.toFixed(1)}</td>`;
+            } else {
+                html += `<td>-</td>`;
+            }
+        });
+        
+        // Add CodeForces category averages
+        cfCategories.forEach(category => {
+            if (validCfData.length > 0) {
+                const avg = validCfData.reduce((sum, user) => {
+                    if (user[category] === "-" || user[category] === "Err") return sum;
+                    return sum + (parseInt(user[category]) || 0);
+                }, 0) / validCfData.length;
+                html += `<td>${avg.toFixed(1)}</td>`;
+            } else {
+                html += `<td>-</td>`;
+            }
+        });
+        
+        // Calculate combined total average across both platforms
+        let totalAvg = "-";
+        if ((validAtcoderData.length > 0) || (validCfData.length > 0)) {
+            let totalSum = 0;
+            let totalCount = 0;
+            
+            // Sum up AtCoder problems
+            if (validAtcoderData.length > 0) {
                 atcoderCategories.forEach(category => {
-                    const avg = validAtcoderData.reduce((sum, user) => {
+                    const categorySum = validAtcoderData.reduce((sum, user) => {
                         if (user[category] === "-" || user[category] === "Err") return sum;
                         return sum + (parseInt(user[category]) || 0);
-                    }, 0) / validAtcoderData.length;
-                    html += `<td>${avg.toFixed(1)}</td>`;
+                    }, 0);
+                    totalSum += categorySum;
                 });
-                
-                // Empty cells for CF categories
-                cfCategories.forEach(() => {
-                    html += `<td>-</td>`;
+                totalCount += validAtcoderData.length;
+            }
+            
+            // Sum up CodeForces problems
+            if (validCfData.length > 0) {
+                cfCategories.forEach(category => {
+                    const categorySum = validCfData.reduce((sum, user) => {
+                        if (user[category] === "-" || user[category] === "Err") return sum;
+                        return sum + (parseInt(user[category]) || 0);
+                    }, 0);
+                    totalSum += categorySum;
                 });
-                
-                html += `<td>-</td></tr>`;
+                totalCount += validCfData.length;
+            }
+            
+            // Calculate average if we have data
+            if (totalCount > 0) {
+                totalAvg = (totalSum / totalCount).toFixed(1);
             }
         }
         
-        // CodeForces averages
-        if (platformVisibility.codeforces && cfCategories.length > 0) {
-            const validCfData = data.filter(user => user.CodeforcesTotal !== "Err" && user.CodeforcesTotal !== "-");
-            
-            if (validCfData.length > 0) {
-                html += `<tr class="summary-row"><td><strong>CodeForces Average</strong></td><td>-</td>`;
-                
-                // Empty cells for AtCoder categories
-                atcoderCategories.forEach(() => {
-                    html += `<td>-</td>`;
-                });
-                
-                // CodeForces category averages
-                cfCategories.forEach(category => {
-                    const avg = validCfData.reduce((sum, user) => {
-                        if (user[category] === "-" || user[category] === "Err") return sum;
-                        return sum + (parseInt(user[category]) || 0);
-                    }, 0) / validCfData.length;
-                    html += `<td>${avg.toFixed(1)}</td>`;
-                });
-                
-                html += `<td>-</td></tr>`;
-            }
-        }
+        html += `<td>${totalAvg}</td></tr>`;
     }
     
     html += "</table>";
@@ -1056,3 +895,5 @@ function renderConsolidatedTable(data) {
     
     document.getElementById("table-container").innerHTML = (hasFilters ? filterInfo : "") + html;
 }
+
+
