@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CodeForces Tracker v1.0</title>
+    
+    <link rel="stylesheet" href="codeforces.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="none,noarchive"/>
+</head>
+
+<body>
+    <div class="header-container">
+        <div>
+            <h1>🔴 CodeForces Tracker v1.0</h1>
+            <p>Made by peacefulguy2005 © 2025</p>
+        </div>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider round"></div>
+            </label>
+            <span id="theme-label">Light Mode</span>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <a href="index.html" class="nav-button">◀ Back to Platforms</a>
+    </div>
+
+    <div class="tab-container">
+        <button class="tab-button active" onclick="showTab('profiles-tab')">User Profiles</button>
+        <button class="tab-button" onclick="showTab('manual-tab')">Manual Entry</button>
+    </div>
+
+    <div id="profiles-tab" class="tab-content">
+        <div class="profiles-header">
+            <h2>Click to select users:</h2>
+            <button id="select-all-btn" class="action-button">Select All</button>
+        </div>
+        <div class="search-box">
+            <input type="text" id="profile-search" placeholder="Search users...">
+        </div>
+        <div id="user-profiles" class="user-profiles-container">
+            <!-- User profiles will be generated here -->
+        </div>
+    </div>
+
+    <div id="manual-tab" class="tab-content" style="display:none;">
+        <label>Enter CodeForces usernames (one per line):</label><br>
+        <textarea id="usernames"></textarea><br>
+    </div>
+
+    <button id="fetch-button" onclick="fetchStats()">Fetch Stats</button>
+
+    <p id="timestamp"></p>
+    <div id="table-container"></div>
+
+    <script src="codeforces.js"></script>
+</body>
+
+</html>

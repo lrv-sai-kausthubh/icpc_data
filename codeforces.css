@@ -1,0 +1,310 @@
+:root {
+    --bg-color: #f5f5f5;
+    --text-color: #2c3e50;
+    --header-color: #2c3e50;
+    --card-bg: #fff;
+    --card-border: #ddd;
+    --table-bg: #fff;
+    --table-border: #ddd;
+    --table-header-bg: #b71c1c; /* Red for CodeForces */
+    --table-header-text: white;
+    --table-row-alt: #f2f2f2;
+    --button-bg: #b71c1c; /* Red for CodeForces */
+    --button-text: white;
+    --button-hover: #8b0000; /* Darker red for hover */
+    --tab-bg: #e0e0e0;
+    --tab-active-bg: #b71c1c; /* Red for CodeForces */
+    --tab-active-text: white;
+    --selected-bg: #ffebee; /* Light red for selection */
+    --selected-border: #b71c1c;
+    --avatar-bg: #b71c1c;
+    --avatar-text: white;
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a2e;
+    --text-color: #e6e6e6;
+    --header-color: #e6e6e6;
+    --card-bg: #16213e;
+    --card-border: #0f3460;
+    --table-bg: #16213e;
+    --table-border: #0f3460;
+    --table-header-bg: #8b0000; /* Darker red for dark mode */
+    --table-header-text: #e6e6e6;
+    --table-row-alt: #1a1a2e;
+    --button-bg: #8b0000; /* Darker red for dark mode */
+    --button-text: #e6e6e6;
+    --button-hover: #5c0000;
+    --tab-bg: #16213e;
+    --tab-active-bg: #8b0000;
+    --tab-active-text: #e6e6e6;
+    --selected-bg: #310000; /* Very dark red for dark mode selection */
+    --selected-border: #b71c1c;
+    --avatar-bg: #8b0000;
+    --avatar-text: #e6e6e6;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: var(--bg-color);
+    padding: 20px;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: var(--header-color);
+    margin-bottom: 5px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    background: var(--table-bg);
+    margin-top: 20px;
+}
+
+th,
+td {
+    border: 1px solid var(--table-border);
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: var(--table-header-bg);
+    color: var(--table-header-text);
+}
+
+tr.top {
+    background-color: gold;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: var(--table-row-alt);
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+textarea {
+    width: 100%;
+    height: 100px;
+    font-size: 16px;
+    padding: 10px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--card-border);
+}
+
+#timestamp {
+    margin-top: 10px;
+    color: var(--text-color);
+}
+
+.nav-buttons {
+    margin-bottom: 20px;
+}
+
+.nav-button {
+    background: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.nav-button:hover {
+    background: var(--button-hover);
+}
+
+/* User profiles styles */
+.tab-container {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.tab-button {
+    background: var(--tab-bg);
+    border: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.tab-button.active {
+    background: var(--tab-active-bg);
+    color: var(--tab-active-text);
+}
+
+.tab-content {
+    margin-bottom: 20px;
+}
+
+.profiles-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--card-border);
+}
+
+.user-profiles-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.user-profile {
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    padding: 15px;
+    width: 120px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.user-profile:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.user-profile.selected {
+    background: var(--selected-bg);
+    border-color: var(--selected-border);
+}
+
+.user-profile .avatar {
+    width: 60px;
+    height: 60px;
+    background: var(--avatar-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    color: var(--avatar-text);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#fetch-button {
+    background: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: block;
+    margin: 20px auto;
+}
+
+#fetch-button:hover {
+    background: var(--button-hover);
+}
+
+.action-button {
+    background: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: 8px 15px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.action-button:hover {
+    background: var(--button-hover);
+}
+
+/* Theme Switch */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.theme-switch {
+    display: inline-block;
+    position: relative;
+    width: 60px;
+    height: 34px;
+    margin-right: 10px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: var(--button-bg);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
