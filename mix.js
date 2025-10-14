@@ -320,8 +320,27 @@ function toggleSelectAll() {
 
 // Show the selected tab
 function showTab(tabId) {
-    // Same as before - no changes needed here
-    // ...existing code...
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Show the selected tab
+    document.getElementById(tabId).style.display = 'block';
+    
+    // Update active class
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Find the button that triggered this and add active class
+    const buttons = document.querySelectorAll('.tab-button');
+    for (let i = 0; i < buttons.length; i++) {
+        if (buttons[i].onclick.toString().includes(tabId)) {
+            buttons[i].classList.add('active');
+            break;
+        }
+    }
 }
 
 // Generate user profile elements
@@ -408,6 +427,100 @@ function filterProfiles() {
 }
 
 // Fetch statistics from both platforms
+// async function fetchStats() {
+//     // Determine which users to fetch
+//     let selectedUsernames = [];
+    
+//     // If we're on the profiles tab and have selected users
+//     if (document.getElementById('profiles-tab').style.display !== 'none' && selectedUsers.length > 0) {
+//         selectedUsernames = selectedUsers;
+//     } else {
+//         // Fallback to manual entry - this needs to be modified for dual platform
+//         const atcoderText = document.getElementById("atcoder-usernames").value.trim();
+//         const codeforcesText = document.getElementById("codeforces-usernames").value.trim();
+        
+//         if (!atcoderText && !codeforcesText) {
+//             alert("Please either select user profiles or enter usernames manually for at least one platform.");
+//             return;
+//         }
+        
+//         // Create mappings for manually entered users
+//         const atcoderUsers = atcoderText.split("\n").map(u => u.trim()).filter(u => u);
+//         const codeforcesUsers = codeforcesText.split("\n").map(u => u.trim()).filter(u => u);
+        
+//         // Use the longer list as the base
+//         const baseList = atcoderUsers.length >= codeforcesUsers.length ? atcoderUsers : codeforcesUsers;
+        
+//         baseList.forEach((user, index) => {
+//             const mappedUser = user;
+//             userMapping[mappedUser] = {
+//                 atcoder: atcoderUsers[index] || "",
+//                 codeforces: codeforcesUsers[index] || ""
+//             };
+//             selectedUsernames.push(mappedUser);
+//         });
+//     }
+    
+//     if (selectedUsernames.length === 0) {
+//         alert("Please select at least one user profile or enter usernames manually.");
+//         return;
+//     }
+    
+//     // Reset data
+//     fetchedData = {
+//         atcoder: [],
+//         codeforces: []
+//     };
+    
+//     // Determine which platforms to fetch
+//     let fetchAtCoder = true;
+//     let fetchCodeforces = true;
+    
+//     // If in manual mode, check platform selections
+//     if (document.getElementById('manual-tab').style.display !== 'none') {
+//         fetchAtCoder = document.getElementById('platform-atcoder').checked;
+//         fetchCodeforces = document.getElementById('platform-codeforces').checked;
+        
+//         if (!fetchAtCoder && !fetchCodeforces) {
+//             alert("Please select at least one platform to fetch data from.");
+//             return;
+//         }
+//     }
+    
+//     // Show loading indicator
+//     document.getElementById("table-container").innerHTML = "<p>Fetching data from both platforms, please wait...</p>";
+    
+//     // Fetch data in parallel
+//     const fetchPromises = [];
+    
+//     if (fetchAtCoder) {
+//         fetchPromises.push(fetchAtCoderData(selectedUsernames));
+//     }
+    
+//     if (fetchCodeforces) {
+//         fetchPromises.push(fetchCodeforcesData(selectedUsernames));
+//     }
+    
+//     try {
+//         await Promise.all(fetchPromises);
+        
+//         // Show the filters
+//         document.getElementById('platform-filter').style.display = 'block';
+//         document.getElementById('category-filter').style.display = 'block';
+        
+//         // Combine and render data
+//         combineAndRenderData();
+        
+//         const timestamp = new Date();
+//         document.getElementById("timestamp").innerText = `Generated on: ${timestamp.toLocaleString()}`;
+//     } catch (error) {
+//         console.error("Error fetching data:", error);
+//         document.getElementById("table-container").innerHTML = "<p>Error fetching data. Please try again.</p>";
+//     }
+// }
+// Replace the existing fetchStats function with this updated version
+
+// Fetch statistics from both platforms
 async function fetchStats() {
     // Determine which users to fetch
     let selectedUsernames = [];
@@ -416,7 +529,7 @@ async function fetchStats() {
     if (document.getElementById('profiles-tab').style.display !== 'none' && selectedUsers.length > 0) {
         selectedUsernames = selectedUsers;
     } else {
-        // Fallback to manual entry - this needs to be modified for dual platform
+        // Fallback to manual entry - modified for separate textareas
         const atcoderText = document.getElementById("atcoder-usernames").value.trim();
         const codeforcesText = document.getElementById("codeforces-usernames").value.trim();
         
@@ -425,21 +538,24 @@ async function fetchStats() {
             return;
         }
         
-        // Create mappings for manually entered users
+        // Process AtCoder usernames
         const atcoderUsers = atcoderText.split("\n").map(u => u.trim()).filter(u => u);
+        
+        // Process CodeForces usernames
         const codeforcesUsers = codeforcesText.split("\n").map(u => u.trim()).filter(u => u);
         
-        // Use the longer list as the base
-        const baseList = atcoderUsers.length >= codeforcesUsers.length ? atcoderUsers : codeforcesUsers;
+        // Create manual mapping
+        // If one platform has more entries than the other, use corresponding positions or leave blank
+        const maxCount = Math.max(atcoderUsers.length, codeforcesUsers.length);
         
-        baseList.forEach((user, index) => {
-            const mappedUser = user;
+        for (let i = 0; i < maxCount; i++) {
+            const mappedUser = `user_${i+1}`;
             userMapping[mappedUser] = {
-                atcoder: atcoderUsers[index] || "",
-                codeforces: codeforcesUsers[index] || ""
+                atcoder: atcoderUsers[i] || "",
+                codeforces: codeforcesUsers[i] || ""
             };
             selectedUsernames.push(mappedUser);
-        });
+        }
     }
     
     if (selectedUsernames.length === 0) {
@@ -464,6 +580,17 @@ async function fetchStats() {
         
         if (!fetchAtCoder && !fetchCodeforces) {
             alert("Please select at least one platform to fetch data from.");
+            return;
+        }
+        
+        // Additional validation: if a platform is selected but no usernames are provided
+        if (fetchAtCoder && document.getElementById("atcoder-usernames").value.trim() === "") {
+            alert("You selected AtCoder but didn't provide any usernames. Please enter AtCoder usernames or uncheck the platform.");
+            return;
+        }
+        
+        if (fetchCodeforces && document.getElementById("codeforces-usernames").value.trim() === "") {
+            alert("You selected CodeForces but didn't provide any usernames. Please enter CodeForces usernames or uncheck the platform.");
             return;
         }
     }

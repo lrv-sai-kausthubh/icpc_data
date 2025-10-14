@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    <div id="manual-tab" class="tab-content" style="display:none;">
+    <!-- <div id="manual-tab" class="tab-content" style="display:none;">
         <label>Enter usernames (one per line):</label><br>
         <textarea id="usernames"></textarea><br>
         <div class="platform-options">
@@ -61,7 +61,36 @@
                 <input type="checkbox" id="platform-codeforces" checked> CodeForces
             </label>
         </div>
+    </div> -->
+
+    <!-- Replace the existing manual-tab div with this updated version -->
+<div id="manual-tab" class="tab-content" style="display:none;">
+    <div class="platform-hint">
+        <p>You can enter usernames for either platform or both. If a user has different IDs across platforms, enter them on the same line in each box.</p>
     </div>
+    
+    <div class="platform-entry">
+        <h3><span class="platform-tag atcoder-tag">AC</span> AtCoder Usernames</h3>
+        <label>Enter AtCoder usernames (one per line):</label><br>
+        <textarea id="atcoder-usernames" placeholder="Enter AtCoder usernames here..."></textarea><br>
+    </div>
+    
+    <div class="platform-entry">
+        <h3><span class="platform-tag codeforces-tag">CF</span> CodeForces Usernames</h3>
+        <label>Enter CodeForces usernames (one per line):</label><br>
+        <textarea id="codeforces-usernames" placeholder="Enter CodeForces usernames here..."></textarea><br>
+    </div>
+    
+    <div class="platform-options">
+        <p>Select which platforms to fetch:</p>
+        <label class="platform-checkbox">
+            <input type="checkbox" id="platform-atcoder" checked> AtCoder
+        </label>
+        <label class="platform-checkbox">
+            <input type="checkbox" id="platform-codeforces" checked> CodeForces
+        </label>
+    </div>
+</div>
 
     <button id="fetch-button" onclick="fetchStats()">Fetch Stats</button>
 
@@ -117,29 +146,29 @@
                 </div>
             </div>
             <!-- Replace the CodeForces categories section with this -->
-<div id="codeforces-categories">
-    <h4>CodeForces</h4>
-    <div class="filter-group">
-        <label class="filter-checkbox">
-            <input type="checkbox" id="filter-CF-800" checked> 800-999
-        </label>
-        <label class="filter-checkbox">
-            <input type="checkbox" id="filter-CF-1000" checked> 1000-1199
-        </label>
-        <label class="filter-checkbox">
-            <input type="checkbox" id="filter-CF-1200" checked> 1200-1399
-        </label>
-        <label class="filter-checkbox">
-            <input type="checkbox" id="filter-CF-1400" checked> 1400-1599
-        </label>
-        <label class="filter-checkbox">
-            <input type="checkbox" id="filter-CF-1600" checked> 1600-1899
-        </label>
-        <label class="filter-checkbox">
-            <input type="checkbox" id="filter-CF-1900" checked> 1900+
-        </label>
-    </div>
-</div>
+            <div id="codeforces-categories">
+                <h4>CodeForces</h4>
+                <div class="filter-group">
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="filter-CF-800" checked> 800-999
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="filter-CF-1000" checked> 1000-1199
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="filter-CF-1200" checked> 1200-1399
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="filter-CF-1400" checked> 1400-1599
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="filter-CF-1600" checked> 1600-1899
+                    </label>
+                    <label class="filter-checkbox">
+                        <input type="checkbox" id="filter-CF-1900" checked> 1900+
+                    </label>
+                </div>
+            </div>
         </div>
         <button id="apply-filter" class="action-button">Apply Filter</button>
     </div>
