@@ -1086,30 +1086,54 @@ function renderConsolidatedTable(data) {
         const isTop = (row.Total === topTotal && row.Total !== "Err");
         const topClass = isTop ? "top" : "";
         
+        // Check for invalid AtCoder username
+        const invalidAtCoder = row.AtCoderUsername === "" || (row["A"] === "Err" && row["B"] === "Err" && row["C"] === "Err");
+        const atCoderUsername = invalidAtCoder ? "Invalid ID" : (row.AtCoderUsername || "-");
+        
+        // Check for invalid CodeForces username
+        const invalidCodeForces = row.CodeforcesUsername === "" || (row["CF-900"] === "Err" && row["CF-1000"] === "Err" && row["CF-1100"] === "Err");
+        const codeforcesUsername = invalidCodeForces ? "Invalid ID" : (row.CodeforcesUsername || "-");
+        
         html += `<tr class="${topClass}">
             <td>
                 <span class="platform-icon atcoder-icon">AC</span>
-                ${row.AtCoderUsername || "-"}
+                ${atCoderUsername}
             </td>
             <td>
                 <span class="platform-icon codeforces-icon">CF</span>
-                ${row.CodeforcesUsername || "-"}
+                ${codeforcesUsername}
             </td>
-            <td>${row["A"] || "-"}</td>
-            <td>${row["B"] || "-"}</td>
-            <td>${row["CF-900"] || "-"}</td>
-            <td>${row["CF-1000"] || "-"}</td>
-            <td>${row["CF-1100"] || "-"}</td>
-            <td>${row["C"] || "-"}</td>`;
+            <td>${row["A"] === "Err" ? "Invalid ID" : (row["A"] || "0")}</td>
+            <td>${row["B"] === "Err" ? "Invalid ID" : (row["B"] || "0")}</td>
+            <td>${row["CF-900"] === "Err" ? "Invalid Codeforces ID" : (row["CF-900"] === "-" ? "0" : row["CF-900"])}</td>
+            <td>${row["CF-1000"] === "Err" ? "Invalid Codeforces ID" : (row["CF-1000"] === "-" ? "0" : row["CF-1000"])}</td>
+            <td>${row["CF-1100"] === "Err" ? "Invalid Codeforces ID" : (row["CF-1100"] === "-" ? "0" : row["CF-1100"])}</td>
+            <td>${row["C"] === "Err" ? "Invalid ID" : (row["C"] || "0")}</td>`;
         
         // Calculate combined total for displayed columns only
         let displayTotal = 0;
         if (row.Total !== "Err") {
-            const columns = ["A", "B", "CF-900", "CF-1000", "CF-1100", "C"];
-            displayTotal = columns.reduce((sum, col) => {
-                if (row[col] === "-" || isNaN(parseInt(row[col]))) return sum;
-                return sum + parseInt(row[col]);
-            }, 0);
+            // Update total calculation to handle "-" and "Err" as 0 for all columns
+            const atcoderColumns = ["A", "B", "C"];
+            const cfColumns = ["CF-900", "CF-1000", "CF-1100"];
+            
+            // Add AtCoder values (treating "-" as 0, "Err" as 0 for calculation purposes)
+            atcoderColumns.forEach(col => {
+                if (row[col] === "Err" || row[col] === "-" || !row[col]) {
+                    // Count as 0
+                } else if (!isNaN(parseInt(row[col]))) {
+                    displayTotal += parseInt(row[col]);
+                }
+            });
+            
+            // Add CodeForces values (treating "-" and "Err" as 0)
+            cfColumns.forEach(col => {
+                if (row[col] === "Err" || row[col] === "-") {
+                    // Count as 0
+                } else if (!isNaN(parseInt(row[col]))) {
+                    displayTotal += parseInt(row[col]);
+                }
+            });
         } else {
             displayTotal = "Err";
         }
@@ -1118,40 +1142,309 @@ function renderConsolidatedTable(data) {
     });
     
     // Calculate summary statistics for the fixed columns
-    if (data.length > 0) {
-        const validData = data.filter(user => user.Total !== "Err");
+    // if (data.length > 0) {
+    //     const validData = data.filter(user => user.Total !== "Err");
         
-        if (validData.length > 0) {
-            html += `<tr class="summary-row">
-                <td colspan="2"><strong>Average</strong></td>`;
+    //     if (validData.length > 0) {
+    //         html += `<tr class="summary-row">
+    //             <td colspan="2"><strong>Average</strong></td>`;
             
-            // Calculate averages for each displayed column
-            const columns = ["A", "B", "CF-900", "CF-1000", "CF-1100", "C"];
-            columns.forEach(col => {
-                const avg = validData.reduce((sum, user) => {
-                    if (user[col] === "-" || isNaN(parseInt(user[col]))) return sum;
-                    return sum + parseInt(user[col]);
-                }, 0) / validData.length;
+    //         // Calculate averages for each displayed column
+    //         const columns = ["A", "B", "CF-900", "CF-1000", "CF-1100", "C"];
+    //         columns.forEach(col => {
+    //             let sum = 0;
+    //             let count = 0;
                 
-                html += `<td>${avg.toFixed(1)}</td>`;
-            });
+    //             validData.forEach(user => {
+    //                 // For all columns, treat "-", "Err", and empty values as 0
+    //                 if (user[col] === "Err" || user[col] === "-" || !user[col]) {
+    //                     count++;
+    //                 } else if (!isNaN(parseInt(user[col]))) {
+    //                     sum += parseInt(user[col]);
+    //                     count++;
+    //                 }
+    //             });
+                
+    //             const avg = count > 0 ? sum / count : 0;
+    //             html += `<td>${avg.toFixed(1)}</td>`;
+    //         });
             
-            // Average total
-            const avgTotal = validData.reduce((sum, user) => {
-                const userTotal = columns.reduce((colSum, col) => {
-                    if (user[col] === "-" || isNaN(parseInt(user[col]))) return colSum;
-                    return colSum + parseInt(user[col]);
-                }, 0);
-                return sum + userTotal;
-            }, 0) / validData.length;
+    //         // Average total (recalculated same way as individual rows)
+    //         let totalSum = 0;
+    //         validData.forEach(user => {
+    //             let userTotal = 0;
+                
+    //             // AtCoder columns (treating "-", "Err", and empty as 0)
+    //             ["A", "B", "C"].forEach(col => {
+    //                 if (user[col] === "Err" || user[col] === "-" || !user[col]) {
+    //                     // Count as 0
+    //                 } else if (!isNaN(parseInt(user[col]))) {
+    //                     userTotal += parseInt(user[col]);
+    //                 }
+    //             });
+                
+    //             // CodeForces columns (treating "-" and "Err" as 0)
+    //             ["CF-900", "CF-1000", "CF-1100"].forEach(col => {
+    //                 if (user[col] === "Err" || user[col] === "-" || !user[col]) {
+    //                     // Count as 0
+    //                 } else if (!isNaN(parseInt(user[col]))) {
+    //                     userTotal += parseInt(user[col]);
+    //                 }
+    //             });
+                
+    //             totalSum += userTotal;
+    //         });
             
-            html += `<td>${avgTotal.toFixed(1)}</td></tr>`;
-        }
-    }
+    //         const avgTotal = totalSum / validData.length;
+    //         html += `<td>${avgTotal.toFixed(1)}</td></tr>`;
+    //     }
+    // }
     
     html += "</table>";
     
     document.getElementById("table-container").innerHTML = html;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// js for sleecting users from dropdown with search and select all functionality
+
+// Track whether all visible users are selected
+let allVisibleSelected = false;
+
+// Set up user dropdown with search functionality and select all button
+function setupUserDropdown() {
+    const searchInput = document.getElementById('user-search');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const toggleAllButton = document.getElementById('toggle-all-users');
+    
+    // Make sure dropdown is hidden initially
+    dropdownMenu.classList.remove('show');
+    
+    // Initially populate dropdown with all users (but keep it hidden)
+    populateDropdown('', false);
+    
+    // Add search functionality
+    searchInput.addEventListener('input', function() {
+        const value = this.value.trim().toLowerCase();
+        
+        // Populate and show dropdown when typing in the search field
+        populateDropdown(value, value !== '');
+        
+        // Reset toggle button text after filtering
+        updateToggleAllButtonText();
+    });
+    
+    // Toggle dropdown visibility when clicking on search input
+    searchInput.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+    });
+    
+    // Hide dropdown when clicking outside (except when clicking on dropdown items)
+    document.addEventListener('click', function(e) {
+        if (!dropdownMenu.contains(e.target) && e.target !== searchInput && e.target !== toggleAllButton) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+    
+    // Set up toggle all button
+    toggleAllButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleAllVisibleUsers();
+        dropdownMenu.classList.add('show'); // Keep dropdown visible after toggle
+    });
+    
+    // Update selected users display initially
+    updateSelectedUsersDisplay();
+}
+
+// Toggle all visible users in the dropdown
+function toggleAllVisibleUsers() {
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const visibleItems = dropdownMenu.querySelectorAll('.dropdown-item');
+    const toggleAllButton = document.getElementById('toggle-all-users');
+    
+    // Determine the new state based on current button text
+    const selectAll = toggleAllButton.textContent === 'Select All';
+    
+    visibleItems.forEach(item => {
+        const username = item.querySelector('span').textContent;
+        const isCurrentlySelected = selectedUsers.includes(username);
+        
+        if (selectAll && !isCurrentlySelected) {
+            // Add to selection
+            selectedUsers.push(username);
+            item.classList.add('selected');
+        } else if (!selectAll && isCurrentlySelected) {
+            // Remove from selection
+            selectedUsers = selectedUsers.filter(u => u !== username);
+            item.classList.remove('selected');
+        }
+    });
+    
+    // Update UI
+    updateSelectedUsersDisplay();
+    updateToggleAllButtonText();
+}
+
+// Update the toggle all button text based on current selection state
+function updateToggleAllButtonText() {
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    const visibleItems = dropdownMenu.querySelectorAll('.dropdown-item');
+    const toggleAllButton = document.getElementById('toggle-all-users');
+    
+    if (visibleItems.length === 0) {
+        toggleAllButton.textContent = 'Select All';
+        return;
+    }
+    
+    // Check if all visible items are already selected
+    const allSelected = Array.from(visibleItems).every(item => {
+        const username = item.querySelector('span').textContent;
+        return selectedUsers.includes(username);
+    });
+    
+    toggleAllButton.textContent = allSelected ? 'Deselect All' : 'Select All';
+}
+
+// Populate dropdown with filtered users
+function populateDropdown(searchTerm, shouldShow = false) {
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    dropdownMenu.innerHTML = '';
+    
+    // Filter users based on search term
+    const filteredUsers = Object.keys(userMapping).filter(username => {
+        const atcoderId = userMapping[username].atcoder.toLowerCase();
+        const codeforcesId = userMapping[username].codeforces.toLowerCase();
+        
+        return username.toLowerCase().includes(searchTerm) || 
+               atcoderId.includes(searchTerm) || 
+               codeforcesId.includes(searchTerm);
+    });
+    
+    // If no results, show message
+    if (filteredUsers.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.textContent = 'No users found';
+        dropdownMenu.appendChild(noResults);
+        updateToggleAllButtonText();
+        return;
+    }
+    
+    // Add user options to dropdown
+    filteredUsers.forEach(username => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        
+        // Create main username display
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = username;
+        
+        // Create platform tags if usernames differ
+        const platformTags = document.createElement('div');
+        platformTags.className = 'platform-tags';
+        
+        if (userMapping[username].atcoder !== userMapping[username].codeforces) {
+            const atcoderTag = document.createElement('span');
+            atcoderTag.className = 'platform-mini-tag atcoder-icon';
+            atcoderTag.textContent = 'AC';
+            atcoderTag.title = `AtCoder: ${userMapping[username].atcoder}`;
+            
+            const codeforcesTag = document.createElement('span');
+            codeforcesTag.className = 'platform-mini-tag codeforces-icon';
+            codeforcesTag.textContent = 'CF';
+            codeforcesTag.title = `CodeForces: ${userMapping[username].codeforces}`;
+            
+            platformTags.appendChild(atcoderTag);
+            platformTags.appendChild(codeforcesTag);
+        }
+        
+        // Add everything to the item
+        item.appendChild(nameSpan);
+        item.appendChild(platformTags);
+        
+        // Highlight if already selected
+        if (selectedUsers.includes(username)) {
+            item.classList.add('selected');
+        }
+        
+        // Add click handler
+        item.addEventListener('click', function(e) {
+            toggleUserSelection(username, e);
+        });
+        
+        dropdownMenu.appendChild(item);
+    });
+    
+    // Only show the dropdown if explicitly requested
+    if (shouldShow) {
+        dropdownMenu.classList.add('show');
+    }
+    
+    // Update the toggle all button text based on the current selection state
+    updateToggleAllButtonText();
+}
+
+// Toggle user selection (keep the existing function but add updating toggle button text)
+function toggleUserSelection(username, event) {
+    const index = selectedUsers.indexOf(username);
+    const searchInput = document.getElementById('user-search');
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    
+    // Check if this was triggered by clicking the remove button
+    const isRemoveButtonClick = event && event.target && event.target.classList.contains('remove-user');
+    
+    if (index === -1) {
+        // Add user to selection
+        selectedUsers.push(username);
+        
+        // Update UI to reflect selection
+        updateSelectedUsersDisplay();
+        
+        // Keep dropdown visible after adding a selection
+        populateDropdown(searchTerm, true);
+        
+        // Select all text in the search input and keep focus
+        searchInput.focus();
+        searchInput.select();
+    } else {
+        // Remove user from selection
+        selectedUsers.splice(index, 1);
+        
+        // Update UI to reflect selection
+        updateSelectedUsersDisplay();
+        
+        // Only keep dropdown visible if not triggered by the remove button
+        if (!isRemoveButtonClick) {
+            populateDropdown(searchTerm, true);
+            
+            // Select all text in the search input and keep focus
+            searchInput.focus();
+            searchInput.select();
+        }
+    }
+    
+    // Update the toggle all button text
+    updateToggleAllButtonText();
 }
 
 
