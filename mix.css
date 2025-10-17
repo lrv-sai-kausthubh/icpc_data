@@ -21,6 +21,11 @@
     --avatar-text: white;
     --atcoder-color: #1b5e20;
     --codeforces-color: #b71c1c;
+
+
+    --platform-header-bg: #f0f0f0;
+    --platform-textarea-bg: #ffffff;
+    --platform-hint-bg: rgba(255, 193, 7, 0.1);
 }
 
 [data-theme="dark"] {
@@ -46,6 +51,11 @@
     --avatar-text: #e6e6e6;
     --atcoder-color: #2e7d32;
     --codeforces-color: #c62828;
+
+    /* ...existing variables... */
+    --platform-header-bg: #1e293b;
+    --platform-textarea-bg: #15213e;
+    --platform-hint-bg: #2c2815;
 }
 
 body {
@@ -445,8 +455,13 @@ input:checked + .slider:before {
 .platform-entry h3 {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 15px;
+    background-color: var(--platform-header-bg);
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
 }
 
 .platform-usernames {
@@ -676,18 +691,29 @@ input:checked + .slider:before {
 }
 
 /* Make textareas smaller height since they're side by side now */
+/* Update the textarea style */
 .platform-entry textarea {
     height: 150px;
+    width: 100%;
+    border: none;
+    border-top: 1px solid var(--card-border);
+    border-radius: 0 0 8px 8px;
+    padding: 12px 15px;
+    font-size: 14px;
+    background-color: var(--platform-textarea-bg);
+    color: var(--text-color);
+    resize: vertical;
 }
 
 /* Platform hint takes full width */
 .platform-hint {
     width: 100%;
-    margin: 0 0 15px 0;
-    padding: 10px;
-    background-color: rgba(255, 193, 7, 0.2);
+    margin: 0 0 20px 0;
+    padding: 12px 15px;
+    background-color: var(--platform-hint-bg);
     border-left: 4px solid #ffc107;
     color: var(--text-color);
+    border-radius: 4px;
 }
 
 /* Make platform options take full width at the bottom */
@@ -728,12 +754,14 @@ input:checked + .slider:before {
     gap: 8px;
     margin: 0;
     padding: 10px 15px;
-    background-color: #1e293b; /* Dark header background */
+    background-color: var(--platform-header-bg);
     font-size: 16px;
     font-weight: bold;
+    color: var(--text-color);
 }
 
 /* Improved textarea styling */
+/* Fix textarea styling to ensure text is always visible */
 .platform-entry textarea {
     height: 150px;
     width: 100%;
@@ -742,7 +770,7 @@ input:checked + .slider:before {
     border-radius: 0 0 8px 8px;
     padding: 12px 15px;
     font-size: 14px;
-    background-color: #15213e; /* Dark textarea background to match image */
+    background-color: var(--platform-textarea-bg);
     color: var(--text-color);
     resize: vertical;
 }
@@ -752,7 +780,7 @@ input:checked + .slider:before {
     width: 100%;
     margin: 0 0 20px 0;
     padding: 12px 15px;
-    background-color: #2c2815;
+    background-color: var(--platform-hint-bg);
     border-left: 4px solid #ffc107;
     color: var(--text-color);
     border-radius: 4px;
@@ -1020,4 +1048,103 @@ input:checked + .slider:before {
         font-size: 10px;
     }
 }
+
+
+
+
+/* Selected users dropdown styles */
+/* More compact selected users dropdown styles */
+.selected-users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px; /* Reduced padding */
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px; /* Smaller font */
+    margin-bottom: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.selected-users-header h3 {
+    font-size: 14px; /* Smaller heading */
+    margin: 0;
+    font-weight: 600;
+}
+
+.selected-users-header:hover {
+    background-color: var(--selected-bg);
+}
+
+.dropdown-arrow {
+    transition: transform 0.3s ease;
+    font-size: 12px; /* Smaller arrow */
+}
+
+.selected-users-list {
+    max-height: 200px; /* Reduced height */
+    overflow-y: auto;
+    transition: max-height 0.2s ease, opacity 0.2s ease;
+    opacity: 1;
+    border: 1px solid var(--card-border);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    margin-top: -11px; /* Tighter connection to header */
+    padding: 8px; /* Smaller padding */
+    background-color: var(--card-bg);
+}
+
+.selected-users-list.collapsed {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    opacity: 0;
+    border: none;
+}
+
+/* Rotate arrow when dropdown is open */
+.selected-users-header.open .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Ensure the dropdown stays above other elements */
+.selected-users-container {
+    position: relative;
+    z-index: 10;
+    margin: 10px 0; /* Reduced margin */
+    width: 50%;
+    max-width: 600px; /* Limit width to match search box */
+}
+
+/* More compact user tags */
+.selected-user-tag {
+    background: var(--selected-bg);
+    border: 1px solid var(--selected-border);
+    padding: 4px 8px; /* Smaller padding */
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px; /* Smaller font */
+    margin: 3px; /* Tighter spacing */
+}
+
+.selected-user-tag .platform-tags {
+    display: flex;
+    gap: 2px;
+    margin-left: 3px;
+}
+
+.selected-user-tag .remove-user {
+    margin-left: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px; /* Smaller X button */
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
 

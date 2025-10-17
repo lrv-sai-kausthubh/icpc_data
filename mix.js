@@ -4,7 +4,7 @@ const defaultAtCoderUsers = [
     "Tanushreddyy", "Karthik0206", "koushikweb", "suhas3157", 
     "joelchopra", "sonu24", "hemanthraojamena", "manichandana", 
     "lrv", "s_dinesh_reddy", "shiva_karthik121", "advaithchaitanya", 
-    "manchalaganesh", "ponugotikruthik", "ManojVakiti", "KiranKumarChenna"
+    "manchalaganesh", "ponugotikruthik", "KiranKumarChenna"
 ];
 
 const defaultCodeforcesUsers = [
@@ -12,7 +12,7 @@ const defaultCodeforcesUsers = [
     "Tanushreddyy", "Karthik0206", "koushikweb", "suhas3157", 
     "joelchopra", "sonu24", "hemanthraojamena", "manichandana", 
     "lrvkausthubh", "sdr", "shiva_karthik121", "advaithchaitanya", 
-    "manchalaganesh", "ponugotikruthik", "ManojVakiti", "KiranKumarChenna"
+    "manchalaganesh", "ponugotikruthik", "KiranKumarChenna"
 ];
 
 // User mapping to connect AtCoder and CodeForces IDs
@@ -342,12 +342,33 @@ function setupUserDropdown() {
 
 
 
-
-
 // Update the display of selected users
 function updateSelectedUsersDisplay() {
     const container = document.getElementById('selected-users');
+    const headerElement = document.getElementById('selected-users-header');
+    
+    // Ensure we have the count element, if not create it
+    let countElement = headerElement.querySelector('.selected-users-count');
+    if (!countElement) {
+        // Create the header structure if it doesn't exist
+        headerElement.innerHTML = `
+            <h3>Selected Users (<span class="selected-users-count">${selectedUsers.length}</span>)</h3>
+            <span class="dropdown-arrow">▼</span>
+        `;
+        countElement = headerElement.querySelector('.selected-users-count');
+    } else {
+        // Just update the count
+        countElement.textContent = selectedUsers.length;
+    }
+    
+    // Clear container
     container.innerHTML = '';
+    
+    // Ensure the container has the collapsed class by default
+    if (!container.classList.contains('collapsed')) {
+        container.classList.add('collapsed');
+        headerElement.classList.remove('open');
+    }
     
     if (selectedUsers.length === 0) {
         const emptyMessage = document.createElement('div');
@@ -371,15 +392,16 @@ function updateSelectedUsersDisplay() {
             const platformTags = document.createElement('div');
             platformTags.className = 'platform-tags';
             
+            // removes the ACP and CFP in the display
             const atcoderTag = document.createElement('span');
-            atcoderTag.className = 'platform-mini-tag atcoder-icon';
-            atcoderTag.textContent = 'AC';
-            atcoderTag.title = `AtCoder: ${userMapping[username].atcoder}`;
+            //atcoderTag.className = 'platform-mini-tag atcoder-icon';
+            //atcoderTag.textContent = 'AC';
+            //atcoderTag.title = `AtCoder: ${userMapping[username].atcoder}`;
             
             const codeforcesTag = document.createElement('span');
-            codeforcesTag.className = 'platform-mini-tag codeforces-icon';
-            codeforcesTag.textContent = 'CF';
-            codeforcesTag.title = `CodeForces: ${userMapping[username].codeforces}`;
+            //codeforcesTag.className = 'platform-mini-tag codeforces-icon';
+            //codeforcesTag.textContent = 'CF';
+            //codeforcesTag.title = `CodeForces: ${userMapping[username].codeforces}`;
             
             platformTags.appendChild(atcoderTag);
             platformTags.appendChild(codeforcesTag);
@@ -400,6 +422,40 @@ function updateSelectedUsersDisplay() {
         container.appendChild(userTag);
     });
 }
+
+// Add this function to handle the dropdown toggle behavior
+function setupSelectedUsersDropdown() {
+    const header = document.getElementById('selected-users-header');
+    const dropdownContent = document.getElementById('selected-users');
+    
+    header.addEventListener('click', function(e) {
+        // Toggle collapsed class on the content
+        dropdownContent.classList.toggle('collapsed');
+        
+        // Toggle open class on the header for arrow rotation
+        header.classList.toggle('open');
+        
+        e.stopPropagation();
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!header.contains(e.target) && !dropdownContent.contains(e.target)) {
+            dropdownContent.classList.add('collapsed');
+            header.classList.remove('open');
+        }
+    });
+}
+
+// Make sure to call this function in your document ready handler
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup dropdown for selected users
+    setupSelectedUsersDropdown();
+    
+    // Your other initialization code...
+});
+
+
 
 
 // Store platform visibility
@@ -674,118 +730,6 @@ function filterProfiles() {
     updateSelectAllStatus();
 }
 
-// Fetch statistics from both platforms
-// async function fetchStats() {
-//     // Determine which users to fetch
-//     let selectedUsernames = [];
-    
-//     // If we're on the profiles tab and have selected users
-//     if (document.getElementById('profiles-tab').style.display !== 'none' && selectedUsers.length > 0) {
-//         selectedUsernames = selectedUsers;
-//     } else {
-//         // Fallback to manual entry - modified for separate textareas
-//         const atcoderText = document.getElementById("atcoder-usernames")?.value.trim() || "";
-//         const codeforcesText = document.getElementById("codeforces-usernames")?.value.trim() || "";
-        
-//         if (!atcoderText && !codeforcesText) {
-//             alert("Please either select user profiles or enter usernames manually for at least one platform.");
-//             return;
-//         }
-        
-//         // Process AtCoder usernames
-//         const atcoderUsers = atcoderText.split("\n").map(u => u.trim()).filter(u => u);
-        
-//         // Process CodeForces usernames
-//         const codeforcesUsers = codeforcesText.split("\n").map(u => u.trim()).filter(u => u);
-        
-//         // Create manual mapping
-//         // If one platform has more entries than the other, use corresponding positions or leave blank
-//         const maxCount = Math.max(atcoderUsers.length, codeforcesUsers.length);
-        
-//         for (let i = 0; i < maxCount; i++) {
-//             const mappedUser = `user_${i+1}`;
-//             userMapping[mappedUser] = {
-//                 atcoder: atcoderUsers[i] || "",
-//                 codeforces: codeforcesUsers[i] || ""
-//             };
-//             selectedUsernames.push(mappedUser);
-//         }
-//     }
-    
-//     if (selectedUsernames.length === 0) {
-//         alert("Please select at least one user profile or enter usernames manually.");
-//         return;
-//     }
-    
-//     // Reset data
-//     fetchedData = {
-//         atcoder: [],
-//         codeforces: []
-//     };
-    
-//     // Determine which platforms to fetch
-//     let fetchAtCoder = true;
-//     let fetchCodeforces = true;
-    
-//     // If in manual mode, check platform selections
-//     if (document.getElementById('manual-tab').style.display !== 'none') {
-//         const atcoderCheckbox = document.getElementById('platform-atcoder');
-//         const codeforcesCheckbox = document.getElementById('platform-codeforces');
-        
-//         fetchAtCoder = atcoderCheckbox && atcoderCheckbox.checked;
-//         fetchCodeforces = codeforcesCheckbox && codeforcesCheckbox.checked;
-        
-//         if (!fetchAtCoder && !fetchCodeforces) {
-//             alert("Please select at least one platform to fetch data from.");
-//             return;
-//         }
-        
-//         // Additional validation: if a platform is selected but no usernames are provided
-//         const atcoderUsernamesField = document.getElementById("atcoder-usernames");
-//         const codeforcesUsernamesField = document.getElementById("codeforces-usernames");
-        
-//         if (fetchAtCoder && atcoderUsernamesField && atcoderUsernamesField.value.trim() === "") {
-//             alert("You selected AtCoder but didn't provide any usernames. Please enter AtCoder usernames or uncheck the platform.");
-//             return;
-//         }
-        
-//         if (fetchCodeforces && codeforcesUsernamesField && codeforcesUsernamesField.value.trim() === "") {
-//             alert("You selected CodeForces but didn't provide any usernames. Please enter CodeForces usernames or uncheck the platform.");
-//             return;
-//         }
-//     }
-    
-//     // Show loading indicator
-//     document.getElementById("table-container").innerHTML = "<p>Fetching data from both platforms, please wait...</p>";
-    
-//     // Fetch data in parallel - DEFINE fetchPromises BEFORE USING IT
-//     const fetchPromises = [];
-    
-//     if (fetchAtCoder) {
-//         fetchPromises.push(fetchAtCoderData(selectedUsernames));
-//     }
-    
-//     if (fetchCodeforces) {
-//         fetchPromises.push(fetchCodeforcesData(selectedUsernames));
-//     }
-    
-//     try {
-//         await Promise.all(fetchPromises);
-        
-//         // Don't try to show filters if they don't exist
-//         // Instead, just combine and render data directly
-//         combineAndRenderData();
-        
-//         const timestamp = new Date();
-//         const timestampElement = document.getElementById("timestamp");
-//         if (timestampElement) {
-//             timestampElement.innerText = `Generated on: ${timestamp.toLocaleString()}`;
-//         }
-//     } catch (error) {
-//         console.error("Error fetching data:", error);
-//         document.getElementById("table-container").innerHTML = "<p>Error fetching data. Please try again.</p>";
-//     }
-// }
 
 // Fetch statistics from both platforms
 async function fetchStats() {
@@ -892,7 +836,20 @@ async function fetchStats() {
         const timestampElement = document.getElementById("timestamp");
         if (timestampElement) {
             timestampElement.innerText = `Generated on: ${timestamp.toLocaleString()}`;
+
+            // Add explanation text for N/A values
+            const explanationText = document.createElement('p');
+            explanationText.className = 'explanation-note';
+            explanationText.innerHTML = '<small><i>Note: "N/A" indicates that the user ID was not found or there was an error fetching data.</i></small>';
+            timestampElement.appendChild(document.createElement('br'));
+            timestampElement.appendChild(explanationText);
+
+
+
+
         }
+        // add html saying N/A = not avaliable
+
     } catch (error) {
         console.error("Error fetching data:", error);
         document.getElementById("table-container").innerHTML = 
@@ -1064,18 +1021,43 @@ function renderConsolidatedTable(data) {
     }
     
     // Start building table with fixed columns in the specific order
-    let html = `<table>
-        <tr>
-            <th>AtCoder Username</th>
-            <th>CodeForces Username</th>
-            <th>AtCoder A</th>
-            <th>AtCoder B</th>
-            <th>CF 900</th>
-            <th>CF 1000</th>
-            <th>CF 1100</th>
-            <th>AtCoder C</th>
-            <th>Total</th>
-        </tr>`;
+    // Start building table with fixed columns in the specific order
+let html = `<table>
+    <tr>
+        <th style="padding-top: 7px; padding-bottom: 7px;">
+            <img src="https://res.cloudinary.com/dldbsjets/image/upload/v1760687848/atcoder_image_czj4fy.jpg" alt="AtCoder" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+             Username
+        </th>
+        <th style="padding-top: 7px; padding-bottom: 7px;">
+            <img src="https://res.cloudinary.com/dldbsjets/image/upload/v1760687847/codeforces_image_xzptbe.jpg" alt="CodeForces" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+             Username
+        </th>
+        <th style="padding-top: 7px; padding-bottom: 7px;">
+            <img src="https://res.cloudinary.com/dldbsjets/image/upload/v1760687848/atcoder_image_czj4fy.jpg" alt="AtCoder" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+             A
+        </th>
+        <th style="padding-top: 7px; padding-bottom: 7px;">
+            <img src="https://res.cloudinary.com/dldbsjets/image/upload/v1760687848/atcoder_image_czj4fy.jpg" alt="AtCoder" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+             B
+        </th>
+        <th style="padding-top: 7px; padding-bottom: 7px;">
+            <img src="https://res.cloudinary.com/dldbsjets/image/upload/v1760687847/codeforces_image_xzptbe.jpg" alt="CodeForces" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+             900
+        </th>
+        <th style="padding-top: 7px; padding-bottom: 7px;">
+            <img src="https://res.cloudinary.com/dldbsjets/image/upload/v1760687847/codeforces_image_xzptbe.jpg" alt="CodeForces" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+             1000
+        </th>
+        <th style="padding-top: 7px; padding-bottom: 7px;">
+            <img src="https://res.cloudinary.com/dldbsjets/image/upload/v1760687847/codeforces_image_xzptbe.jpg" alt="CodeForces" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+             1100
+        </th>
+        <th style="padding-top: 7px; padding-bottom: 7px;">
+            <img src="https://res.cloudinary.com/dldbsjets/image/upload/v1760687848/atcoder_image_czj4fy.jpg" alt="AtCoder" style="height: 20px; vertical-align: middle; margin-right: 5px;"> 
+             C
+        </th>
+        <th style="padding-top: 7px; padding-bottom: 7px;">Total</th>
+    </tr>`;
     
     // Find the top performer
     const validUsers = data.filter(user => user.Total !== "Err");
@@ -1088,28 +1070,28 @@ function renderConsolidatedTable(data) {
         
         // Check for invalid AtCoder username
         const invalidAtCoder = row.AtCoderUsername === "" || (row["A"] === "Err" && row["B"] === "Err" && row["C"] === "Err");
-        const atCoderUsername = invalidAtCoder ? "Invalid ID" : (row.AtCoderUsername || "-");
+        const atCoderUsername = invalidAtCoder ? "N/A" : (row.AtCoderUsername || "-");
         
         // Check for invalid CodeForces username
         const invalidCodeForces = row.CodeforcesUsername === "" || (row["CF-900"] === "Err" && row["CF-1000"] === "Err" && row["CF-1100"] === "Err");
-        const codeforcesUsername = invalidCodeForces ? "Invalid ID" : (row.CodeforcesUsername || "-");
+        const codeforcesUsername = invalidCodeForces ? "N/A" : (row.CodeforcesUsername || "-");
         
         html += `<tr class="${topClass}">
             <td>
-                <span class="platform-icon atcoder-icon">AC</span>
+                
                 ${atCoderUsername}
             </td>
             <td>
-                <span class="platform-icon codeforces-icon">CF</span>
+                <!--<span class="platform-icon codeforces-icon"></span>-->
                 ${codeforcesUsername}
             </td>
-            <td>${row["A"] === "Err" ? "Invalid ID" : (row["A"] || "0")}</td>
-            <td>${row["B"] === "Err" ? "Invalid ID" : (row["B"] || "0")}</td>
-            <td>${row["CF-900"] === "Err" ? "Invalid Codeforces ID" : (row["CF-900"] === "-" ? "0" : row["CF-900"])}</td>
-            <td>${row["CF-1000"] === "Err" ? "Invalid Codeforces ID" : (row["CF-1000"] === "-" ? "0" : row["CF-1000"])}</td>
-            <td>${row["CF-1100"] === "Err" ? "Invalid Codeforces ID" : (row["CF-1100"] === "-" ? "0" : row["CF-1100"])}</td>
-            <td>${row["C"] === "Err" ? "Invalid ID" : (row["C"] || "0")}</td>`;
-        
+            <td>${row["A"] === "Err" ? "N/A" : (row["A"] || "0")}</td>
+            <td>${row["B"] === "Err" ? "N/A" : (row["B"] || "0")}</td>
+            <td>${row["CF-900"] === "Err" ? "N/A" : (row["CF-900"] === "-" ? "0" : row["CF-900"])}</td>
+            <td>${row["CF-1000"] === "Err" ? "N/A" : (row["CF-1000"] === "-" ? "0" : row["CF-1000"])}</td>
+            <td>${row["CF-1100"] === "Err" ? "N/A" : (row["CF-1100"] === "-" ? "0" : row["CF-1100"])}</td>
+            <td>${row["C"] === "Err" ? "N/A" : (row["C"] || "0")}</td>`;
+
         // Calculate combined total for displayed columns only
         let displayTotal = 0;
         if (row.Total !== "Err") {
@@ -1359,19 +1341,21 @@ function populateDropdown(searchTerm, shouldShow = false) {
         const nameSpan = document.createElement('span');
         nameSpan.textContent = username;
         
+
+        // removed ACP & CFP THE ICONZ
         // Create platform tags if usernames differ
         const platformTags = document.createElement('div');
         platformTags.className = 'platform-tags';
         
         if (userMapping[username].atcoder !== userMapping[username].codeforces) {
             const atcoderTag = document.createElement('span');
-            atcoderTag.className = 'platform-mini-tag atcoder-icon';
-            atcoderTag.textContent = 'AC';
+            //atcoderTag.className = 'platform-mini-tag atcoder-icon';
+            //atcoderTag.textContent = 'AC';
             atcoderTag.title = `AtCoder: ${userMapping[username].atcoder}`;
             
             const codeforcesTag = document.createElement('span');
-            codeforcesTag.className = 'platform-mini-tag codeforces-icon';
-            codeforcesTag.textContent = 'CF';
+            //codeforcesTag.className = 'platform-mini-tag codeforces-icon';
+            //codeforcesTag.textContent = 'CF';
             codeforcesTag.title = `CodeForces: ${userMapping[username].codeforces}`;
             
             platformTags.appendChild(atcoderTag);
