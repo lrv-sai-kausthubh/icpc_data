@@ -137,71 +137,6 @@ let categoryFilters = {
     "CF-1900": true   // 1900+
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
     // Setup dropdown for user selection
@@ -300,8 +235,8 @@ function populateDropdown(searchTerm, shouldShow = false) {
         }
         
         // Add click handler
-        item.addEventListener('click', function() {
-            toggleUserSelection(username);
+        item.addEventListener('click', function(e) {
+            toggleUserSelection(username, e);
         });
         
         dropdownMenu.appendChild(item);
@@ -315,30 +250,46 @@ function populateDropdown(searchTerm, shouldShow = false) {
 
 
 
+
 // Toggle user selection
 // Toggle user selection
-function toggleUserSelection(username) {
+function toggleUserSelection(username, event) {
     const index = selectedUsers.indexOf(username);
     const searchInput = document.getElementById('user-search');
     const searchTerm = searchInput.value.trim().toLowerCase();
     
+    // Check if this was triggered by clicking the remove button
+    const isRemoveButtonClick = event && event.target && event.target.classList.contains('remove-user');
+    
     if (index === -1) {
         // Add user to selection
         selectedUsers.push(username);
+        
+        // Update UI to reflect selection
+        updateSelectedUsersDisplay();
+        
+        // Keep dropdown visible after adding a selection
+        populateDropdown(searchTerm, true);
+        
+        // Select all text in the search input and keep focus
+        searchInput.focus();
+        searchInput.select();
     } else {
         // Remove user from selection
         selectedUsers.splice(index, 1);
+        
+        // Update UI to reflect selection
+        updateSelectedUsersDisplay();
+        
+        // Only keep dropdown visible if not triggered by the remove button
+        if (!isRemoveButtonClick) {
+            populateDropdown(searchTerm, true);
+            
+            // Select all text in the search input and keep focus
+            searchInput.focus();
+            searchInput.select();
+        }
     }
-    
-    // Update UI to reflect selection
-    updateSelectedUsersDisplay();
-    
-    // Keep dropdown visible after selection
-    populateDropdown(searchTerm, true);
-    
-    // Select all text in the search input and keep focus
-    searchInput.focus();
-    searchInput.select();
 }
 
 
@@ -442,108 +393,13 @@ function updateSelectedUsersDisplay() {
         removeBtn.title = 'Remove user';
         removeBtn.addEventListener('click', function(e) {
             e.stopPropagation();
-            toggleUserSelection(username);
+            toggleUserSelection(username, e);
         });
         userTag.appendChild(removeBtn);
         
         container.appendChild(userTag);
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // Store platform visibility
