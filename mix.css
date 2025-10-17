@@ -494,3 +494,198 @@ input:checked + .slider:before {
     color: #ffebee !important; /* Light text */
 }
 
+
+/* Platform icons */
+.platform-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    margin-right: 6px;
+}
+
+.atcoder-icon {
+    background-color: var(--atcoder-color);
+}
+
+.codeforces-icon {
+    background-color: var(--codeforces-color);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Dropdown styles */
+.dropdown-container {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.dropdown-search {
+    position: relative;
+}
+
+.dropdown-search input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+    font-size: 16px;
+    background: var(--card-bg);
+    color: var(--text-color);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    z-index: 100;
+    display: none;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-item:hover {
+    background-color: var(--selected-bg);
+}
+
+.dropdown-item .platform-tags {
+    display: flex;
+    gap: 5px;
+    font-size: 12px;
+}
+
+/* Selected users display */
+.selected-users-container {
+    margin-top: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.selected-users-container h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.selected-users-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.selected-user-tag {
+    background: var(--selected-bg);
+    border: 1px solid var(--selected-border);
+    padding: 8px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.selected-user-tag .platform-tags {
+    display: flex;
+    gap: 2px;
+    margin-left: 5px;
+}
+
+.selected-user-tag .remove-user {
+    margin-left: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.selected-user-tag .remove-user:hover {
+    opacity: 1;
+}
+
+.platform-mini-tag {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.no-results {
+    padding: 10px 15px;
+    font-style: italic;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+.empty-selection {
+    padding: 10px;
+    font-style: italic;
+    color: var(--text-color);
+    opacity: 0.7;
+}
+
+

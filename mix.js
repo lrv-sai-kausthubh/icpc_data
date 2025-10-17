@@ -3,7 +3,7 @@ const defaultAtCoderUsers = [
     "surya_sujith09", "Chandrika0205", "jalaluddin420", "harshith2507",
     "Tanushreddyy", "Karthik0206", "koushikweb", "suhas3157", 
     "joelchopra", "sonu24", "hemanthraojamena", "manichandana", 
-    "lrv", "sdr", "shiva_karthik121", "advaithchaitanya", 
+    "lrv", "s_dinesh_reddy", "shiva_karthik121", "advaithchaitanya", 
     "manchalaganesh", "ponugotikruthik", "ManojVakiti", "KiranKumarChenna"
 ];
 
@@ -24,8 +24,9 @@ defaultAtCoderUsers.forEach((user, index) => {
     };
 });
 
-// Add this new function to combine data by user
 
+
+// Add this new function to combine data by user
 function consolidateUserData() {
     const consolidatedData = [];
     const userMap = new Map();
@@ -37,27 +38,19 @@ function consolidateUserData() {
                 Username: atcoderUser.Username,
                 AtCoderUsername: atcoderUser.PlatformUsername,
                 CodeforcesUsername: "",
-                // AtCoder data
+                // AtCoder data - only track A, B, C as requested
                 "A": atcoderUser.A,
                 "B": atcoderUser.B,
                 "C": atcoderUser.C,
-                "D": atcoderUser.D,
-                "E": atcoderUser.E,
-                "F": atcoderUser.F,
-                "G": atcoderUser.G,
-                "H/Ex": atcoderUser["H/Ex"],
                 // Initialize CodeForces data as empty
-                "CF-800": "-",
+                "CF-900": "-",
                 "CF-1000": "-",
-                "CF-1200": "-",
-                "CF-1400": "-",
-                "CF-1600": "-",
-                "CF-1900": "-",
-                // Calculate AtCoder total
-                AtCoderTotal: atcoderUser.Total,
-                CodeforcesTotal: "-",
+                "CF-1100": "-",
                 // Combined total will be calculated later
-                Total: atcoderUser.Total === "Err" ? "Err" : parseInt(atcoderUser.Total) || 0
+                Total: (atcoderUser.Total === "Err") ? "Err" : 
+                       ((parseInt(atcoderUser.A) || 0) + 
+                        (parseInt(atcoderUser.B) || 0) + 
+                        (parseInt(atcoderUser.C) || 0))
             });
         });
     }
@@ -69,19 +62,15 @@ function consolidateUserData() {
                 // Update existing user with CodeForces data
                 const userData = userMap.get(cfUser.Username);
                 userData.CodeforcesUsername = cfUser.PlatformUsername;
-                userData["CF-800"] = cfUser["CF-800"];
+                userData["CF-900"] = cfUser["CF-900"];
                 userData["CF-1000"] = cfUser["CF-1000"];
-                userData["CF-1200"] = cfUser["CF-1200"];
-                userData["CF-1400"] = cfUser["CF-1400"];
-                userData["CF-1600"] = cfUser["CF-1600"];
-                userData["CF-1900"] = cfUser["CF-1900"];
-                userData.CodeforcesTotal = cfUser.Total;
+                userData["CF-1100"] = cfUser["CF-1100"];
                 
-                // Update combined total
+                // Update total with the specific CF columns we're tracking
                 if (userData.Total !== "Err" && cfUser.Total !== "Err") {
-                    userData.Total = parseInt(userData.Total) + parseInt(cfUser.Total);
-                } else if (cfUser.Total !== "Err") {
-                    userData.Total = parseInt(cfUser.Total);
+                    userData.Total += (parseInt(cfUser["CF-900"]) || 0) + 
+                                     (parseInt(cfUser["CF-1000"]) || 0) + 
+                                     (parseInt(cfUser["CF-1100"]) || 0);
                 }
             } else {
                 // Create new user with only CodeForces data
@@ -93,22 +82,15 @@ function consolidateUserData() {
                     "A": "-",
                     "B": "-",
                     "C": "-",
-                    "D": "-",
-                    "E": "-",
-                    "F": "-",
-                    "G": "-",
-                    "H/Ex": "-",
                     // CodeForces data
-                    "CF-800": cfUser["CF-800"],
+                    "CF-900": cfUser["CF-900"],
                     "CF-1000": cfUser["CF-1000"],
-                    "CF-1200": cfUser["CF-1200"],
-                    "CF-1400": cfUser["CF-1400"],
-                    "CF-1600": cfUser["CF-1600"],
-                    "CF-1900": cfUser["CF-1900"],
-                    // Totals
-                    AtCoderTotal: "-",
-                    CodeforcesTotal: cfUser.Total,
-                    Total: cfUser.Total
+                    "CF-1100": cfUser["CF-1100"],
+                    // Total
+                    Total: (cfUser.Total === "Err") ? "Err" : 
+                           ((parseInt(cfUser["CF-900"]) || 0) + 
+                            (parseInt(cfUser["CF-1000"]) || 0) + 
+                            (parseInt(cfUser["CF-1100"]) || 0))
                 });
             }
         });
@@ -121,6 +103,7 @@ function consolidateUserData() {
     
     return consolidatedData;
 }
+
 
 // Track selected users
 let selectedUsers = [];
@@ -153,6 +136,271 @@ let categoryFilters = {
     "CF-1600": true,  // 1600-1899
     "CF-1900": true   // 1900+
 };
+
+// Initialize the app
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup dropdown for user selection
+    setupUserDropdown();
+    
+    // Add theme switch functionality
+    const themeSwitch = document.getElementById('checkbox');
+    const themeLabel = document.getElementById('theme-label');
+    
+    // Check if user has previously selected a theme
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    
+    // Update checkbox state based on saved preference
+    if (currentTheme === 'dark') {
+        themeSwitch.checked = true;
+        themeLabel.textContent = 'Dark Mode';
+    }
+    
+    // Listen for theme toggle
+    themeSwitch.addEventListener('change', function() {
+        if (this.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            themeLabel.textContent = 'Dark Mode';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            themeLabel.textContent = 'Light Mode';
+        }
+    });
+});
+
+
+
+// Populate dropdown with filtered users
+// Populate dropdown with filtered users
+function populateDropdown(searchTerm, shouldShow = false) {
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    dropdownMenu.innerHTML = '';
+    
+    // Filter users based on search term
+    const filteredUsers = Object.keys(userMapping).filter(username => {
+        const atcoderId = userMapping[username].atcoder.toLowerCase();
+        const codeforcesId = userMapping[username].codeforces.toLowerCase();
+        
+        return username.toLowerCase().includes(searchTerm) || 
+               atcoderId.includes(searchTerm) || 
+               codeforcesId.includes(searchTerm);
+    });
+    
+    // If no results, show message
+    if (filteredUsers.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.textContent = 'No users found';
+        dropdownMenu.appendChild(noResults);
+        return;
+    }
+    
+    // Add user options to dropdown
+    filteredUsers.forEach(username => {
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        
+        // Create main username display
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = username;
+        
+        // Create platform tags if usernames differ
+        const platformTags = document.createElement('div');
+        platformTags.className = 'platform-tags';
+        
+        if (userMapping[username].atcoder !== userMapping[username].codeforces) {
+            const atcoderTag = document.createElement('span');
+            atcoderTag.className = 'platform-mini-tag atcoder-icon';
+            atcoderTag.textContent = 'AC';
+            atcoderTag.title = `AtCoder: ${userMapping[username].atcoder}`;
+            
+            const codeforcesTag = document.createElement('span');
+            codeforcesTag.className = 'platform-mini-tag codeforces-icon';
+            codeforcesTag.textContent = 'CF';
+            codeforcesTag.title = `CodeForces: ${userMapping[username].codeforces}`;
+            
+            platformTags.appendChild(atcoderTag);
+            platformTags.appendChild(codeforcesTag);
+        }
+        
+        // Add everything to the item
+        item.appendChild(nameSpan);
+        item.appendChild(platformTags);
+        
+        // Highlight if already selected
+        if (selectedUsers.includes(username)) {
+            item.classList.add('selected');
+        }
+        
+        // Add click handler
+        item.addEventListener('click', function(e) {
+            toggleUserSelection(username, e);
+        });
+        
+        dropdownMenu.appendChild(item);
+    });
+    
+    // Only show the dropdown if explicitly requested
+    if (shouldShow) {
+        dropdownMenu.classList.add('show');
+    }
+}
+
+
+
+
+// Toggle user selection
+// Toggle user selection
+function toggleUserSelection(username, event) {
+    const index = selectedUsers.indexOf(username);
+    const searchInput = document.getElementById('user-search');
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    
+    // Check if this was triggered by clicking the remove button
+    const isRemoveButtonClick = event && event.target && event.target.classList.contains('remove-user');
+    
+    if (index === -1) {
+        // Add user to selection
+        selectedUsers.push(username);
+        
+        // Update UI to reflect selection
+        updateSelectedUsersDisplay();
+        
+        // Keep dropdown visible after adding a selection
+        populateDropdown(searchTerm, true);
+        
+        // Select all text in the search input and keep focus
+        searchInput.focus();
+        searchInput.select();
+    } else {
+        // Remove user from selection
+        selectedUsers.splice(index, 1);
+        
+        // Update UI to reflect selection
+        updateSelectedUsersDisplay();
+        
+        // Only keep dropdown visible if not triggered by the remove button
+        if (!isRemoveButtonClick) {
+            populateDropdown(searchTerm, true);
+            
+            // Select all text in the search input and keep focus
+            searchInput.focus();
+            searchInput.select();
+        }
+    }
+}
+
+
+
+
+
+
+
+// Set up user dropdown with search functionality
+function setupUserDropdown() {
+    const searchInput = document.getElementById('user-search');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+    
+    // Make sure dropdown is hidden initially
+    dropdownMenu.classList.remove('show');
+    
+    // Initially populate dropdown with all users (but keep it hidden)
+    populateDropdown('', false);
+    
+    // Add search functionality
+    searchInput.addEventListener('input', function() {
+        const value = this.value.trim().toLowerCase();
+        
+        // Populate and show dropdown when typing in the search field
+        populateDropdown(value, value !== '');
+    });
+    
+    // Toggle dropdown visibility when clicking on search input
+    searchInput.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+    });
+    
+    // Hide dropdown when clicking outside (except when clicking on dropdown items)
+    document.addEventListener('click', function(e) {
+        if (!dropdownMenu.contains(e.target) && e.target !== searchInput) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+    
+    // Update selected users display initially
+    updateSelectedUsersDisplay();
+}
+
+
+
+
+
+
+
+
+
+
+
+// Update the display of selected users
+function updateSelectedUsersDisplay() {
+    const container = document.getElementById('selected-users');
+    container.innerHTML = '';
+    
+    if (selectedUsers.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'empty-selection';
+        emptyMessage.textContent = 'No users selected. Search and select users above.';
+        container.appendChild(emptyMessage);
+        return;
+    }
+    
+    selectedUsers.forEach(username => {
+        const userTag = document.createElement('div');
+        userTag.className = 'selected-user-tag';
+        
+        // User name
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = username;
+        userTag.appendChild(nameSpan);
+        
+        // Platform indicators if different
+        if (userMapping[username].atcoder !== userMapping[username].codeforces) {
+            const platformTags = document.createElement('div');
+            platformTags.className = 'platform-tags';
+            
+            const atcoderTag = document.createElement('span');
+            atcoderTag.className = 'platform-mini-tag atcoder-icon';
+            atcoderTag.textContent = 'AC';
+            atcoderTag.title = `AtCoder: ${userMapping[username].atcoder}`;
+            
+            const codeforcesTag = document.createElement('span');
+            codeforcesTag.className = 'platform-mini-tag codeforces-icon';
+            codeforcesTag.textContent = 'CF';
+            codeforcesTag.title = `CodeForces: ${userMapping[username].codeforces}`;
+            
+            platformTags.appendChild(atcoderTag);
+            platformTags.appendChild(codeforcesTag);
+            userTag.appendChild(platformTags);
+        }
+        
+        // Remove button
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'remove-user';
+        removeBtn.textContent = '×';
+        removeBtn.title = 'Remove user';
+        removeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleUserSelection(username, e);
+        });
+        userTag.appendChild(removeBtn);
+        
+        container.appendChild(userTag);
+    });
+}
+
 
 // Store platform visibility
 let platformVisibility = {
@@ -435,30 +683,33 @@ function filterProfiles() {
 //     if (document.getElementById('profiles-tab').style.display !== 'none' && selectedUsers.length > 0) {
 //         selectedUsernames = selectedUsers;
 //     } else {
-//         // Fallback to manual entry - this needs to be modified for dual platform
-//         const atcoderText = document.getElementById("atcoder-usernames").value.trim();
-//         const codeforcesText = document.getElementById("codeforces-usernames").value.trim();
+//         // Fallback to manual entry - modified for separate textareas
+//         const atcoderText = document.getElementById("atcoder-usernames")?.value.trim() || "";
+//         const codeforcesText = document.getElementById("codeforces-usernames")?.value.trim() || "";
         
 //         if (!atcoderText && !codeforcesText) {
 //             alert("Please either select user profiles or enter usernames manually for at least one platform.");
 //             return;
 //         }
         
-//         // Create mappings for manually entered users
+//         // Process AtCoder usernames
 //         const atcoderUsers = atcoderText.split("\n").map(u => u.trim()).filter(u => u);
+        
+//         // Process CodeForces usernames
 //         const codeforcesUsers = codeforcesText.split("\n").map(u => u.trim()).filter(u => u);
         
-//         // Use the longer list as the base
-//         const baseList = atcoderUsers.length >= codeforcesUsers.length ? atcoderUsers : codeforcesUsers;
+//         // Create manual mapping
+//         // If one platform has more entries than the other, use corresponding positions or leave blank
+//         const maxCount = Math.max(atcoderUsers.length, codeforcesUsers.length);
         
-//         baseList.forEach((user, index) => {
-//             const mappedUser = user;
+//         for (let i = 0; i < maxCount; i++) {
+//             const mappedUser = `user_${i+1}`;
 //             userMapping[mappedUser] = {
-//                 atcoder: atcoderUsers[index] || "",
-//                 codeforces: codeforcesUsers[index] || ""
+//                 atcoder: atcoderUsers[i] || "",
+//                 codeforces: codeforcesUsers[i] || ""
 //             };
 //             selectedUsernames.push(mappedUser);
-//         });
+//         }
 //     }
     
 //     if (selectedUsernames.length === 0) {
@@ -478,11 +729,28 @@ function filterProfiles() {
     
 //     // If in manual mode, check platform selections
 //     if (document.getElementById('manual-tab').style.display !== 'none') {
-//         fetchAtCoder = document.getElementById('platform-atcoder').checked;
-//         fetchCodeforces = document.getElementById('platform-codeforces').checked;
+//         const atcoderCheckbox = document.getElementById('platform-atcoder');
+//         const codeforcesCheckbox = document.getElementById('platform-codeforces');
+        
+//         fetchAtCoder = atcoderCheckbox && atcoderCheckbox.checked;
+//         fetchCodeforces = codeforcesCheckbox && codeforcesCheckbox.checked;
         
 //         if (!fetchAtCoder && !fetchCodeforces) {
 //             alert("Please select at least one platform to fetch data from.");
+//             return;
+//         }
+        
+//         // Additional validation: if a platform is selected but no usernames are provided
+//         const atcoderUsernamesField = document.getElementById("atcoder-usernames");
+//         const codeforcesUsernamesField = document.getElementById("codeforces-usernames");
+        
+//         if (fetchAtCoder && atcoderUsernamesField && atcoderUsernamesField.value.trim() === "") {
+//             alert("You selected AtCoder but didn't provide any usernames. Please enter AtCoder usernames or uncheck the platform.");
+//             return;
+//         }
+        
+//         if (fetchCodeforces && codeforcesUsernamesField && codeforcesUsernamesField.value.trim() === "") {
+//             alert("You selected CodeForces but didn't provide any usernames. Please enter CodeForces usernames or uncheck the platform.");
 //             return;
 //         }
 //     }
@@ -490,7 +758,7 @@ function filterProfiles() {
 //     // Show loading indicator
 //     document.getElementById("table-container").innerHTML = "<p>Fetching data from both platforms, please wait...</p>";
     
-//     // Fetch data in parallel
+//     // Fetch data in parallel - DEFINE fetchPromises BEFORE USING IT
 //     const fetchPromises = [];
     
 //     if (fetchAtCoder) {
@@ -504,37 +772,41 @@ function filterProfiles() {
 //     try {
 //         await Promise.all(fetchPromises);
         
-//         // Show the filters
-//         document.getElementById('platform-filter').style.display = 'block';
-//         document.getElementById('category-filter').style.display = 'block';
-        
-//         // Combine and render data
+//         // Don't try to show filters if they don't exist
+//         // Instead, just combine and render data directly
 //         combineAndRenderData();
         
 //         const timestamp = new Date();
-//         document.getElementById("timestamp").innerText = `Generated on: ${timestamp.toLocaleString()}`;
+//         const timestampElement = document.getElementById("timestamp");
+//         if (timestampElement) {
+//             timestampElement.innerText = `Generated on: ${timestamp.toLocaleString()}`;
+//         }
 //     } catch (error) {
 //         console.error("Error fetching data:", error);
 //         document.getElementById("table-container").innerHTML = "<p>Error fetching data. Please try again.</p>";
 //     }
 // }
-// Replace the existing fetchStats function with this updated version
 
 // Fetch statistics from both platforms
 async function fetchStats() {
     // Determine which users to fetch
     let selectedUsernames = [];
     
-    // If we're on the profiles tab and have selected users
-    if (document.getElementById('profiles-tab').style.display !== 'none' && selectedUsers.length > 0) {
+    // Check if we're on the profiles tab with the dropdown selection
+    if (document.getElementById('profiles-tab').style.display !== 'none') {
+        // Use the dropdown selection
+        if (selectedUsers.length === 0) {
+            alert("Please select at least one user from the dropdown.");
+            return;
+        }
         selectedUsernames = selectedUsers;
     } else {
-        // Fallback to manual entry - modified for separate textareas
-        const atcoderText = document.getElementById("atcoder-usernames").value.trim();
-        const codeforcesText = document.getElementById("codeforces-usernames").value.trim();
+        // Handle manual entry with separate textareas
+        const atcoderText = document.getElementById("atcoder-usernames")?.value.trim() || "";
+        const codeforcesText = document.getElementById("codeforces-usernames")?.value.trim() || "";
         
         if (!atcoderText && !codeforcesText) {
-            alert("Please either select user profiles or enter usernames manually for at least one platform.");
+            alert("Please either select users from the dropdown or enter usernames manually for at least one platform.");
             return;
         }
         
@@ -544,8 +816,7 @@ async function fetchStats() {
         // Process CodeForces usernames
         const codeforcesUsers = codeforcesText.split("\n").map(u => u.trim()).filter(u => u);
         
-        // Create manual mapping
-        // If one platform has more entries than the other, use corresponding positions or leave blank
+        // Create manual mapping - if one platform has more entries than the other, use corresponding positions or leave blank
         const maxCount = Math.max(atcoderUsers.length, codeforcesUsers.length);
         
         for (let i = 0; i < maxCount; i++) {
@@ -558,12 +829,7 @@ async function fetchStats() {
         }
     }
     
-    if (selectedUsernames.length === 0) {
-        alert("Please select at least one user profile or enter usernames manually.");
-        return;
-    }
-    
-    // Reset data
+    // Reset data structures
     fetchedData = {
         atcoder: [],
         codeforces: []
@@ -575,8 +841,11 @@ async function fetchStats() {
     
     // If in manual mode, check platform selections
     if (document.getElementById('manual-tab').style.display !== 'none') {
-        fetchAtCoder = document.getElementById('platform-atcoder').checked;
-        fetchCodeforces = document.getElementById('platform-codeforces').checked;
+        const atcoderCheckbox = document.getElementById('platform-atcoder');
+        const codeforcesCheckbox = document.getElementById('platform-codeforces');
+        
+        fetchAtCoder = atcoderCheckbox && atcoderCheckbox.checked;
+        fetchCodeforces = codeforcesCheckbox && codeforcesCheckbox.checked;
         
         if (!fetchAtCoder && !fetchCodeforces) {
             alert("Please select at least one platform to fetch data from.");
@@ -584,19 +853,23 @@ async function fetchStats() {
         }
         
         // Additional validation: if a platform is selected but no usernames are provided
-        if (fetchAtCoder && document.getElementById("atcoder-usernames").value.trim() === "") {
+        const atcoderUsernamesField = document.getElementById("atcoder-usernames");
+        const codeforcesUsernamesField = document.getElementById("codeforces-usernames");
+        
+        if (fetchAtCoder && atcoderUsernamesField && atcoderUsernamesField.value.trim() === "") {
             alert("You selected AtCoder but didn't provide any usernames. Please enter AtCoder usernames or uncheck the platform.");
             return;
         }
         
-        if (fetchCodeforces && document.getElementById("codeforces-usernames").value.trim() === "") {
+        if (fetchCodeforces && codeforcesUsernamesField && codeforcesUsernamesField.value.trim() === "") {
             alert("You selected CodeForces but didn't provide any usernames. Please enter CodeForces usernames or uncheck the platform.");
             return;
         }
     }
     
     // Show loading indicator
-    document.getElementById("table-container").innerHTML = "<p>Fetching data from both platforms, please wait...</p>";
+    document.getElementById("table-container").innerHTML = 
+        "<p>Fetching data from both platforms, please wait...</p>";
     
     // Fetch data in parallel
     const fetchPromises = [];
@@ -612,20 +885,23 @@ async function fetchStats() {
     try {
         await Promise.all(fetchPromises);
         
-        // Show the filters
-        document.getElementById('platform-filter').style.display = 'block';
-        document.getElementById('category-filter').style.display = 'block';
-        
-        // Combine and render data
+        // Combine and render data without showing filters
         combineAndRenderData();
         
         const timestamp = new Date();
-        document.getElementById("timestamp").innerText = `Generated on: ${timestamp.toLocaleString()}`;
+        const timestampElement = document.getElementById("timestamp");
+        if (timestampElement) {
+            timestampElement.innerText = `Generated on: ${timestamp.toLocaleString()}`;
+        }
     } catch (error) {
         console.error("Error fetching data:", error);
-        document.getElementById("table-container").innerHTML = "<p>Error fetching data. Please try again.</p>";
+        document.getElementById("table-container").innerHTML = 
+            "<p>Error fetching data. Please try again.</p>";
     }
 }
+
+
+
 
 // Fetch AtCoder data
 async function fetchAtCoderData(selectedUsernames) {
@@ -689,6 +965,7 @@ async function fetchAtCoderData(selectedUsernames) {
 
 // Fetch Codeforces data
 // Update the CodeForces data fetching function to categorize by rating
+// Fetch Codeforces data
 async function fetchCodeforcesData(selectedUsernames) {
     for (let username of selectedUsernames) {
         const codeforcesUsername = userMapping[username].codeforces;
@@ -704,7 +981,7 @@ async function fetchCodeforcesData(selectedUsernames) {
             const submissions = data.result;
             const accepted = submissions.filter(sub => sub.verdict === "OK");
             
-            // Create a unique set of solved problems with their ratings
+            // Create a unique set of solved problems with their exact ratings
             const solvedProblems = [];
             const uniqueProblemIds = new Set();
             
@@ -719,42 +996,32 @@ async function fetchCodeforcesData(selectedUsernames) {
                 }
             });
 
-            const levels = {
-                "CF-800": 0,   // 800-999
-                "CF-1000": 0,  // 1000-1199
-                "CF-1200": 0,  // 1200-1399
-                "CF-1400": 0,  // 1400-1599
-                "CF-1600": 0,  // 1600-1899
-                "CF-1900": 0   // 1900+
+            // Track exact ratings instead of ranges
+            const exactRatings = {
+                "CF-900": 0,
+                "CF-1000": 0,
+                "CF-1100": 0
             };
             
             solvedProblems.forEach(problem => {
                 const rating = problem.rating;
                 
-                if (rating === 0) {
-                    // Skip unrated problems
-                    return;
-                } else if (rating < 1000) {
-                    levels["CF-800"]++;
-                } else if (rating < 1200) {
-                    levels["CF-1000"]++;
-                } else if (rating < 1400) {
-                    levels["CF-1200"]++;
-                } else if (rating < 1600) {
-                    levels["CF-1400"]++;
-                } else if (rating < 1900) {
-                    levels["CF-1600"]++;
-                } else {
-                    levels["CF-1900"]++;
+                // Only count problems with exactly 900, 1000, or 1100 rating
+                if (rating === 900) {
+                    exactRatings["CF-900"]++;
+                } else if (rating === 1000) {
+                    exactRatings["CF-1000"]++;
+                } else if (rating === 1100) {
+                    exactRatings["CF-1100"]++;
                 }
             });
             
-            const total = Object.values(levels).reduce((a, b) => a + b, 0);
+            const total = Object.values(exactRatings).reduce((a, b) => a + b, 0);
             fetchedData.codeforces.push({
                 Username: username,
                 PlatformUsername: codeforcesUsername,
                 Platform: "CodeForces",
-                ...levels,
+                ...exactRatings,
                 Total: total
             });
         } catch (e) {
@@ -762,12 +1029,9 @@ async function fetchCodeforcesData(selectedUsernames) {
                 Username: username,
                 PlatformUsername: codeforcesUsername,
                 Platform: "CodeForces",
-                "CF-800": "Err",
+                "CF-900": "Err",
                 "CF-1000": "Err",
-                "CF-1200": "Err",
-                "CF-1400": "Err",
-                "CF-1600": "Err",
-                "CF-1900": "Err",
+                "CF-1100": "Err",
                 "Total": "Err"
             });
         }
@@ -778,7 +1042,7 @@ async function fetchCodeforcesData(selectedUsernames) {
 // Replace the existing combineAndRenderData function
 
 function combineAndRenderData() {
-    // Use the new consolidation function instead of simply concatenating arrays
+    // Use the new consolidation function
     const consolidatedData = consolidateUserData();
     
     // Sort by total score
@@ -795,52 +1059,27 @@ function combineAndRenderData() {
 
 function renderConsolidatedTable(data) {
     if (data.length === 0) {
-        document.getElementById("table-container").innerHTML = "<p>No data to display. Please select at least one platform.</p>";
+        document.getElementById("table-container").innerHTML = "<p>No data to display. Please select at least one user.</p>";
         return;
     }
     
-    // Determine which categories to show based on platform visibility and filters
-    let atcoderCategories = [];
-    if (platformVisibility.atcoder) {
-        atcoderCategories = ["A", "B", "C", "D", "E", "F", "G", "H/Ex"]
-            .filter(cat => categoryFilters[cat]);
-    }
-    
-    let cfCategories = [];
-    if (platformVisibility.codeforces) {
-        cfCategories = ["CF-800", "CF-1000", "CF-1200", "CF-1400", "CF-1600", "CF-1900"]
-            .filter(cat => categoryFilters[cat]);
-    }
-    
-    // Start building table
-    let html = "<table><tr><th>Username</th><th>Platform IDs</th>";
-    
-    // Add headers for AtCoder categories with atcoder-header class
-    atcoderCategories.forEach(category => {
-        html += `<th class="atcoder-header">${category}</th>`;
-    });
-    
-    // Add headers for CodeForces categories with codeforces-header class
-    cfCategories.forEach(category => {
-        // Display rating ranges
-        let displayText = "";
-        switch(category) {
-            case "CF-800": displayText = "800-999"; break;
-            case "CF-1000": displayText = "1000-1199"; break;
-            case "CF-1200": displayText = "1200-1399"; break;
-            case "CF-1400": displayText = "1400-1599"; break;
-            case "CF-1600": displayText = "1600-1899"; break;
-            case "CF-1900": displayText = "1900+"; break;
-            default: displayText = category.replace('CF-', '');
-        }
-        html += `<th class="codeforces-header">${displayText}</th>`;
-    });
-    
-    // Add total column
-    html += "<th>Total</th></tr>";
+    // Start building table with fixed columns in the specific order
+    let html = `<table>
+        <tr>
+            <th>AtCoder Username</th>
+            <th>CodeForces Username</th>
+            <th>AtCoder A</th>
+            <th>AtCoder B</th>
+            <th>CF 900</th>
+            <th>CF 1000</th>
+            <th>CF 1100</th>
+            <th>AtCoder C</th>
+            <th>Total</th>
+        </tr>`;
     
     // Find the top performer
-    const topTotal = data[0].Total !== "Err" ? data[0].Total : 0;
+    const validUsers = data.filter(user => user.Total !== "Err");
+    const topTotal = validUsers.length > 0 ? Math.max(...validUsers.map(user => user.Total)) : 0;
     
     // Add rows for each user
     data.forEach(row => {
@@ -848,179 +1087,71 @@ function renderConsolidatedTable(data) {
         const topClass = isTop ? "top" : "";
         
         html += `<tr class="${topClass}">
-            <td>${row.Username}</td>
-            <td>`;
-            
-        // Show platform usernames with appropriate tags
-        if (row.AtCoderUsername && row.AtCoderUsername !== "-") {
-            html += `<span class="platform-tag atcoder-tag">AC: ${row.AtCoderUsername}</span> `;
-        }
-        if (row.CodeforcesUsername && row.CodeforcesUsername !== "-") {
-            html += `<span class="platform-tag codeforces-tag">CF: ${row.CodeforcesUsername}</span>`;
-        }
+            <td>
+                <span class="platform-icon atcoder-icon">AC</span>
+                ${row.AtCoderUsername || "-"}
+            </td>
+            <td>
+                <span class="platform-icon codeforces-icon">CF</span>
+                ${row.CodeforcesUsername || "-"}
+            </td>
+            <td>${row["A"] || "-"}</td>
+            <td>${row["B"] || "-"}</td>
+            <td>${row["CF-900"] || "-"}</td>
+            <td>${row["CF-1000"] || "-"}</td>
+            <td>${row["CF-1100"] || "-"}</td>
+            <td>${row["C"] || "-"}</td>`;
         
-        html += `</td>`;
-        
-        // Add AtCoder category cells
-        atcoderCategories.forEach(category => {
-            html += `<td>${row[category]}</td>`;
-        });
-        
-        // Add CodeForces category cells
-        cfCategories.forEach(category => {
-            html += `<td>${row[category]}</td>`;
-        });
-        
-        // Calculate filtered total based on selected categories
-        let filteredTotal = 0;
+        // Calculate combined total for displayed columns only
+        let displayTotal = 0;
         if (row.Total !== "Err") {
-            // For AtCoder categories
-            atcoderCategories.forEach(cat => {
-                if (row[cat] !== "-" && !isNaN(parseInt(row[cat]))) {
-                    filteredTotal += parseInt(row[cat]);
-                }
-            });
-            
-            // For CodeForces categories
-            cfCategories.forEach(cat => {
-                if (row[cat] !== "-" && !isNaN(parseInt(row[cat]))) {
-                    filteredTotal += parseInt(row[cat]);
-                }
-            });
+            const columns = ["A", "B", "CF-900", "CF-1000", "CF-1100", "C"];
+            displayTotal = columns.reduce((sum, col) => {
+                if (row[col] === "-" || isNaN(parseInt(row[col]))) return sum;
+                return sum + parseInt(row[col]);
+            }, 0);
         } else {
-            filteredTotal = "Err";
+            displayTotal = "Err";
         }
         
-        html += `<td>${filteredTotal}</td></tr>`;
+        html += `<td>${displayTotal}</td></tr>`;
     });
     
-    // Calculate summary statistics - COMBINED IN SINGLE ROW
-    if (data.length > 0 && (platformVisibility.atcoder || platformVisibility.codeforces)) {
-        // Prepare data for averages
-        const validAtcoderData = platformVisibility.atcoder ? 
-            data.filter(user => user.AtCoderTotal !== "Err" && user.AtCoderTotal !== "-") : [];
+    // Calculate summary statistics for the fixed columns
+    if (data.length > 0) {
+        const validData = data.filter(user => user.Total !== "Err");
+        
+        if (validData.length > 0) {
+            html += `<tr class="summary-row">
+                <td colspan="2"><strong>Average</strong></td>`;
             
-        const validCfData = platformVisibility.codeforces ? 
-            data.filter(user => user.CodeforcesTotal !== "Err" && user.CodeforcesTotal !== "-") : [];
-        
-        // Start the combined averages row
-        html += `<tr class="summary-row"><td><strong>Platform Averages</strong></td><td>`;
-        
-        // Show platform tags in the second column
-        if (platformVisibility.atcoder && validAtcoderData.length > 0) {
-            html += `<span class="platform-tag atcoder-tag">AC</span> `;
-        }
-        if (platformVisibility.codeforces && validCfData.length > 0) {
-            html += `<span class="platform-tag codeforces-tag">CF</span>`;
-        }
-        
-        html += `</td>`;
-        
-        // Add AtCoder category averages
-        atcoderCategories.forEach(category => {
-            if (validAtcoderData.length > 0) {
-                const avg = validAtcoderData.reduce((sum, user) => {
-                    if (user[category] === "-" || user[category] === "Err") return sum;
-                    return sum + (parseInt(user[category]) || 0);
-                }, 0) / validAtcoderData.length;
+            // Calculate averages for each displayed column
+            const columns = ["A", "B", "CF-900", "CF-1000", "CF-1100", "C"];
+            columns.forEach(col => {
+                const avg = validData.reduce((sum, user) => {
+                    if (user[col] === "-" || isNaN(parseInt(user[col]))) return sum;
+                    return sum + parseInt(user[col]);
+                }, 0) / validData.length;
+                
                 html += `<td>${avg.toFixed(1)}</td>`;
-            } else {
-                html += `<td>-</td>`;
-            }
-        });
-        
-        // Add CodeForces category averages
-        cfCategories.forEach(category => {
-            if (validCfData.length > 0) {
-                const avg = validCfData.reduce((sum, user) => {
-                    if (user[category] === "-" || user[category] === "Err") return sum;
-                    return sum + (parseInt(user[category]) || 0);
-                }, 0) / validCfData.length;
-                html += `<td>${avg.toFixed(1)}</td>`;
-            } else {
-                html += `<td>-</td>`;
-            }
-        });
-        
-        // Calculate combined total average across both platforms
-        let totalAvg = "-";
-        if ((validAtcoderData.length > 0) || (validCfData.length > 0)) {
-            let totalSum = 0;
-            let totalCount = 0;
+            });
             
-            // Sum up AtCoder problems
-            if (validAtcoderData.length > 0) {
-                atcoderCategories.forEach(category => {
-                    const categorySum = validAtcoderData.reduce((sum, user) => {
-                        if (user[category] === "-" || user[category] === "Err") return sum;
-                        return sum + (parseInt(user[category]) || 0);
-                    }, 0);
-                    totalSum += categorySum;
-                });
-                totalCount += validAtcoderData.length;
-            }
+            // Average total
+            const avgTotal = validData.reduce((sum, user) => {
+                const userTotal = columns.reduce((colSum, col) => {
+                    if (user[col] === "-" || isNaN(parseInt(user[col]))) return colSum;
+                    return colSum + parseInt(user[col]);
+                }, 0);
+                return sum + userTotal;
+            }, 0) / validData.length;
             
-            // Sum up CodeForces problems
-            if (validCfData.length > 0) {
-                cfCategories.forEach(category => {
-                    const categorySum = validCfData.reduce((sum, user) => {
-                        if (user[category] === "-" || user[category] === "Err") return sum;
-                        return sum + (parseInt(user[category]) || 0);
-                    }, 0);
-                    totalSum += categorySum;
-                });
-                totalCount += validCfData.length;
-            }
-            
-            // Calculate average if we have data
-            if (totalCount > 0) {
-                totalAvg = (totalSum / totalCount).toFixed(1);
-            }
+            html += `<td>${avgTotal.toFixed(1)}</td></tr>`;
         }
-        
-        html += `<td>${totalAvg}</td></tr>`;
     }
     
     html += "</table>";
     
-    // Display active filters
-    let filterInfo = "<div class='active-filters'><strong>Showing: </strong>";
-    
-    // Display selected platforms
-    if (platformVisibility.atcoder) {
-        filterInfo += `<span class="platform-tag atcoder-tag">AtCoder</span>`;
-    }
-    if (platformVisibility.codeforces) {
-        filterInfo += `<span class="platform-tag codeforces-tag">CodeForces</span>`;
-    }
-    
-    // Display selected categories
-    let hasFilters = false;
-    if (atcoderCategories.length < 8 || cfCategories.length < 6) {
-        hasFilters = true;
-        filterInfo += " <strong>Categories:</strong> ";
-        atcoderCategories.forEach(category => {
-            filterInfo += `<span class='filter-tag'>${category}</span>`;
-        });
-        cfCategories.forEach(category => {
-            // Use proper display text for rating ranges
-            let displayText = "";
-            switch(category) {
-                case "CF-800": displayText = "800-999"; break;
-                case "CF-1000": displayText = "1000-1199"; break;
-                case "CF-1200": displayText = "1200-1399"; break;
-                case "CF-1400": displayText = "1400-1599"; break;
-                case "CF-1600": displayText = "1600-1899"; break;
-                case "CF-1900": displayText = "1900+"; break;
-                default: displayText = category.replace('CF-', '');
-            }
-            filterInfo += `<span class='filter-tag'>${displayText}</span>`;
-        });
-    }
-    
-    filterInfo += "</div>";
-    
-    document.getElementById("table-container").innerHTML = (hasFilters ? filterInfo : "") + html;
+    document.getElementById("table-container").innerHTML = html;
 }
 
 
